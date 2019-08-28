@@ -1,9 +1,12 @@
 package de.thm.noah.ruben.kantyapp;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -14,6 +17,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TableLayout;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.List;
 
 import de.thm.noah.ruben.kantyapp.model.AppData;
@@ -90,7 +98,7 @@ public class NoteViewActivity extends AppCompatActivity {
 
         System.out.println("Size: " + notes.size());
 
-        for (Note note : notes){
+        for (Note note : notes) {
             System.out.println(notes.indexOf(note));
             AppCompatTextView textView = new AppCompatTextView(this);
             textView.setText(note.getText());
@@ -122,6 +130,7 @@ public class NoteViewActivity extends AppCompatActivity {
                 return super.onOptionsItemSelected(item);
         }
     }
+
     @Override
     public void onBackPressed() {
         saveNotesToFile(appData);
@@ -129,6 +138,21 @@ public class NoteViewActivity extends AppCompatActivity {
     }
 
     private void saveNotesToFile(AppData appData) {
+        GsonBuilder builder = new GsonBuilder();
+        Gson gson = builder.create();
+//            FileOutputStream fOut = openFileOutput("notebook", Context.MODE_APPEND);
+        File file = new File(this.getFilesDir(), "notebook.json");
+        try {
+            FileWriter fileWriter = new FileWriter(file);
+            String notesToJson = gson.toJson(appData.getNotes());
+            fileWriter.write(notesToJson);
+            fileWriter.flush();
+//            for (Note note : appData.getNotes()) {
+//
+//            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
     }
 }

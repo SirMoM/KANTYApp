@@ -50,7 +50,12 @@ public class AppData  implements java.io.Serializable {
     }
 
     public void setNotes(List<Note> notes) {
+        getAllTags();
         this.notes = notes;
+    }
+
+    private void getAllTags() {
+        //TODO get all Tags from File
     }
 
 
