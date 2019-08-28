@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">KANTYApp</string>
+    <string name="title_activity_note_view">NoteViewActivity</string>
+    <string name="action_new_note">New Note</string>
+
+    <string name="logo_or_something">Logo or something</string>
+    <string name="action_delete_note">Delete note</string>
+    <string name="action_settings">Settings</string>
+</resources>
