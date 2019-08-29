@@ -1,27 +1,25 @@
 package de.thm.noah.ruben.kantyapp;
 
-import android.content.Context;
+import android.annotation.SuppressLint;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.appcompat.widget.AppCompatTextView;
-
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.TableLayout;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatTextView;
+import androidx.appcompat.widget.Toolbar;
+
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.List;
@@ -35,16 +33,75 @@ public class NoteViewActivity extends AppCompatActivity {
 
     Intent newNoteIntent;
     AppData appData;
-    private View.OnClickListener openNoteHandler = new View.OnClickListener() {
+
+    /**
+     * Which type is shown
+     */
+    private boolean toggleView = true;
+
+    private boolean longPress = false;
+    private View.OnClickListener openNoteOnClickHandler = new View.OnClickListener() {
 
         @Override
         public void onClick(View view) {
-            System.out.println("NoteViewActivity.onClick");
             // populate newest intend  with newest "AppData" and "Note" to edit
             newNoteIntent = new Intent(NoteViewActivity.this, NoteEditActivity.class);
             newNoteIntent.putExtra(ValueKey.APP_DATA, appData);
             newNoteIntent.putExtra(ValueKey.NOTE_ID, view.getTransitionName());
             startActivity(newNoteIntent);
+        }
+    };
+    private View.OnLongClickListener deleteNoteOnLongClickHandler = new View.OnLongClickListener() {
+        @Override
+        public boolean onLongClick(View view) {
+            longPress = true;
+            NoteViewActivity.this.createAlert(view);
+            return true;
+        }
+    };
+
+    private void createAlert(View view) {
+        final Integer ID = Integer.valueOf(view.getTransitionName());
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(NoteViewActivity.this);
+        alertDialogBuilder.setTitle(R.string.delete_tile);
+        alertDialogBuilder.setMessage(R.string.delete_msg);
+        alertDialogBuilder.setPositiveButton(R.string.delete, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                if (NoteViewActivity.this.appData.removeNote(ID)) {
+                    NoteViewActivity.this.populateNoteView(NoteViewActivity.this.appData.getNotes());
+                    longPress = false;
+                }
+            }
+        });
+        alertDialogBuilder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                longPress = false;
+            }
+        });
+        alertDialogBuilder.create().show();
+    }
+
+    private final View.OnTouchListener openNoteOnTouchHandler = new View.OnTouchListener() {
+
+        @Override
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+
+            if (motionEvent.getAction() == MotionEvent.ACTION_MOVE) {
+                return false;
+            }
+            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                return false;
+            }
+            if (motionEvent.getAction() == MotionEvent.ACTION_UP && !longPress) {
+                // populate newest intend  with newest "AppData" and "Note" to edit
+                newNoteIntent = new Intent(NoteViewActivity.this, NoteEditActivity.class);
+                newNoteIntent.putExtra(ValueKey.APP_DATA, appData);
+                newNoteIntent.putExtra(ValueKey.NOTE_ID, view.getTransitionName());
+                startActivity(newNoteIntent);
+            }
+            return false;
         }
     };
 
@@ -56,15 +113,6 @@ public class NoteViewActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
     }
-
-//    @Override
-//    protected void onStart() {
-//        System.out.println("NoteViewActivity.onStart");
-//        super.onStart();
-//        appData = (AppData) getIntent().getSerializableExtra(ValueKey.APP_DATA);
-//        populateNoteView(appData.getNotes());
-//
-//    }
 
     @Override
     protected void onResume() {
@@ -88,8 +136,6 @@ public class NoteViewActivity extends AppCompatActivity {
         });
 
         populateNoteView(appData.getNotes());
-
-
     }
 
     /**
@@ -97,35 +143,31 @@ public class NoteViewActivity extends AppCompatActivity {
      *
      * @param notes alle notizen der App
      */
+    @SuppressLint("ClickableViewAccessibility")
     private void populateNoteView(List<Note> notes) {
-        LinearLayout view = (LinearLayout) findViewById(R.id.contendLayout);
-
-        System.out.println("Size: " + notes.size());
+        LinearLayout view = findViewById(R.id.contendLayout);
+//        view.removeAllViewsInLayout();
+        view.removeAllViews();
 
         for (Note note : notes) {
-//            MarkdownView markdownView = new MarkdownView(this);
-//            markdownView.loadMarkdown(note.getText());
-////            markdownView.setClickable(true);
-//            markdownView.setOnClickListener(this.openNoteHandler);
-//            markdownView.setTransitionName(String.valueOf(note.getID()));
-//            markdownView.setOnTouchListener(new View.OnTouchListener() {
-//                @Override
-//                public boolean onTouch(View view, MotionEvent motionEvent) {
-//                    // populate newest intend  with newest "AppData" and "Note" to edit
-//                    newNoteIntent = new Intent(NoteViewActivity.this, NoteEditActivity.class);
-//                    newNoteIntent.putExtra(ValueKey.APP_DATA, appData);
-//                    newNoteIntent.putExtra(ValueKey.NOTE_ID, view.getTransitionName());
-//                    startActivity(newNoteIntent);
-//                    return false;
-//                }
-//            });
-//            view.addView(markdownView);
-            AppCompatTextView textView = new AppCompatTextView(this);
-            textView.setText(note.getText());
-            textView.setClickable(true);
-            textView.setOnClickListener(this.openNoteHandler);
-            textView.setTransitionName(String.valueOf(note.getID()));
-            view.addView(textView);
+            if (toggleView) {
+                MarkdownView markdownView = new MarkdownView(this);
+                markdownView.loadMarkdown(note.getText());
+                markdownView.setOnLongClickListener(this.deleteNoteOnLongClickHandler);
+                markdownView.setLongClickable(true);
+                markdownView.setTransitionName(String.valueOf(note.getID()));
+                markdownView.setOnTouchListener(this.openNoteOnTouchHandler);
+                view.addView(markdownView);
+            } else {
+                AppCompatTextView textView = new AppCompatTextView(this);
+                textView.setText(note.getText());
+                textView.setClickable(true);
+                textView.setLongClickable(true);
+                textView.setOnClickListener(this.openNoteOnClickHandler);
+                textView.setOnLongClickListener(this.deleteNoteOnLongClickHandler);
+                textView.setTransitionName(String.valueOf(note.getID()));
+                view.addView(textView);
+            }
         }
     }
 
@@ -142,8 +184,14 @@ public class NoteViewActivity extends AppCompatActivity {
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.action_new_note:
-                System.out.println("NoteViewActivity.onOptionsItemSelected");
                 startActivity(newNoteIntent);
+                return true;
+            case R.id.toggleView:
+                toggleView = !toggleView;
+                populateNoteView(appData.getNotes());
+                return true;
+            case R.id.action_delete_note:
+                System.out.println("TODO !!!!!!!!!!");
                 return true;
             default:
                 return super.onOptionsItemSelected(item);

@@ -66,8 +66,7 @@ public class MainActivity extends AppCompatActivity {
             List<Note> notes = gson.fromJson(str, listType);
             appData.setNotes(notes);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return false;
+            System.out.println("No save file!");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
             return false;

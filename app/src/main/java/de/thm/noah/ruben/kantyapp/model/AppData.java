@@ -1,6 +1,5 @@
 package de.thm.noah.ruben.kantyapp.model;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -59,6 +58,14 @@ public class AppData implements java.io.Serializable {
         this.uniqueTags = uniqueTags;
     }
 
+    public Set<Integer> getUniqueIDs() {
+        return uniqueIDs;
+    }
+
+    public void setUniqueIDs(Set<Integer> uniqueIDs) {
+        this.uniqueIDs = uniqueIDs;
+    }
+
     public List<Note> getNotes() {
         return notes;
     }
@@ -70,19 +77,21 @@ public class AppData implements java.io.Serializable {
      */
     public void setNotes(List<Note> notes) {
         this.notes = notes;
+        setAllTagsAndIDs();
     }
 
     /**
      * Ruft alle IDs und Tags aus der neuen Liste der Notizen ab und speichert diese.
      */
-    private void getAllTagsIDs() {
+    private void setAllTagsAndIDs() {
         HashSet<Integer> newIDs = new HashSet<Integer>();
         HashSet<String> newTags = new HashSet<String>();
-        for (Note note: getNotes()) {
+        for (Note note : getNotes()) {
             newIDs.add(note.getID());
             newTags.addAll(note.getTags());
         }
-
+        setUniqueTags(newTags);
+        setUniqueIDs(newIDs);
     }
 
     /**
@@ -114,4 +123,23 @@ public class AppData implements java.io.Serializable {
         }
         return null;
     }
+
+    public boolean removeNote(Integer id) {
+        Note noteToDelete = getNoteByID(id);
+        try {
+            getNotes().remove(noteToDelete);
+            uniqueIDs.remove(noteToDelete.getID());
+            uniqueTags.removeAll(noteToDelete.getTags());
+            // TODO maybe lazy if the performance suffers
+            for (Note note : getNotes()) {
+                uniqueTags.addAll(note.getTags());
+            }
+        } catch (Exception exception) {
+            System.out.println("Could not remove note");
+            return false;
+        }
+        return true;
+    }
+
+
 }
