@@ -20,7 +20,12 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <include layout="@layout/content_note_view" />
+    <include
+        layout="@layout/content_note_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="?attr/actionBarSize"
+        android:clickable="false" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/addNote"

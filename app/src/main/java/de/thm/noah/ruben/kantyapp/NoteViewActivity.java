@@ -127,13 +127,15 @@ public class NoteViewActivity extends AppCompatActivity {
 
         // Update onClickListener TODO dose this replace tho old ?
         FloatingActionButton addNoteButton = findViewById(R.id.addNote);
-        addNoteButton.setOnClickListener(new View.OnClickListener() {
+        addNoteButton.setOnClickListener(this.openNoteOnClickHandler);
 
-            @Override
-            public void onClick(View view) {
-                startActivity(newNoteIntent);
-            }
-        });
+
+//                new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                startActivity(newNoteIntent);
+//            }
+//        });
 
         populateNoteView(appData.getNotes());
     }
@@ -150,6 +152,9 @@ public class NoteViewActivity extends AppCompatActivity {
         view.removeAllViews();
 
         for (Note note : notes) {
+            AppCompatTextView sep = new AppCompatTextView(NoteViewActivity.this);
+            sep.setText("_______________________________");
+            view.addView(sep);
             if (toggleView) {
                 MarkdownView markdownView = new MarkdownView(this);
                 markdownView.loadMarkdown(note.getText());
