@@ -14,12 +14,35 @@ import java.util.List;
 public class Note implements Serializable {
 
 
+    /**
+     * ID der Notiz
+     */
     private final int id;
+
+    /**
+     * Text der Notiz
+     */
     private String text;
+
+    /**
+     * Tags der Notiz
+     */
     private List<String> tags;
+
+    /**
+     * Pfad zur notiz (mit ggf. Pseudo-Ordnern usw)
+     */
     private String path;
-    private final Date creationDate;
+
+    /**
+     *  Datum an dem die Notiz zuletzt bearbeitet wurde.
+     */
     private Date modifyDate;
+
+    /**
+     *  Datum an dem die Notiz erzeugt wurde.
+     */
+    private final Date creationDate;
 
     /**
      * @param id die ID der Notiz

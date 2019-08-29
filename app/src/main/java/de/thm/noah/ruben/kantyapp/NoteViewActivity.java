@@ -14,7 +14,9 @@ import androidx.appcompat.widget.AppCompatTextView;
 
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.TableLayout;
 
 import java.io.File;
@@ -27,6 +29,7 @@ import java.util.List;
 import de.thm.noah.ruben.kantyapp.model.AppData;
 import de.thm.noah.ruben.kantyapp.model.Note;
 import de.thm.noah.ruben.kantyapp.model.ValueKey;
+import us.feras.mdv.MarkdownView;
 
 public class NoteViewActivity extends AppCompatActivity {
 
@@ -36,6 +39,7 @@ public class NoteViewActivity extends AppCompatActivity {
 
         @Override
         public void onClick(View view) {
+            System.out.println("NoteViewActivity.onClick");
             // populate newest intend  with newest "AppData" and "Note" to edit
             newNoteIntent = new Intent(NoteViewActivity.this, NoteEditActivity.class);
             newNoteIntent.putExtra(ValueKey.APP_DATA, appData);
@@ -94,17 +98,32 @@ public class NoteViewActivity extends AppCompatActivity {
      * @param notes alle notizen der App
      */
     private void populateNoteView(List<Note> notes) {
-        TableLayout view = findViewById(R.id.contendLayout);
+        LinearLayout view = (LinearLayout) findViewById(R.id.contendLayout);
 
         System.out.println("Size: " + notes.size());
 
         for (Note note : notes) {
-            System.out.println(notes.indexOf(note));
+//            MarkdownView markdownView = new MarkdownView(this);
+//            markdownView.loadMarkdown(note.getText());
+////            markdownView.setClickable(true);
+//            markdownView.setOnClickListener(this.openNoteHandler);
+//            markdownView.setTransitionName(String.valueOf(note.getID()));
+//            markdownView.setOnTouchListener(new View.OnTouchListener() {
+//                @Override
+//                public boolean onTouch(View view, MotionEvent motionEvent) {
+//                    // populate newest intend  with newest "AppData" and "Note" to edit
+//                    newNoteIntent = new Intent(NoteViewActivity.this, NoteEditActivity.class);
+//                    newNoteIntent.putExtra(ValueKey.APP_DATA, appData);
+//                    newNoteIntent.putExtra(ValueKey.NOTE_ID, view.getTransitionName());
+//                    startActivity(newNoteIntent);
+//                    return false;
+//                }
+//            });
+//            view.addView(markdownView);
             AppCompatTextView textView = new AppCompatTextView(this);
             textView.setText(note.getText());
             textView.setClickable(true);
             textView.setOnClickListener(this.openNoteHandler);
-//            textView.addExtraDataToAccessibilityNodeInfo(new AccessibilityNodeInfo(), "test", new Bundle().);
             textView.setTransitionName(String.valueOf(note.getID()));
             view.addView(textView);
         }
@@ -140,16 +159,12 @@ public class NoteViewActivity extends AppCompatActivity {
     private void saveNotesToFile(AppData appData) {
         GsonBuilder builder = new GsonBuilder();
         Gson gson = builder.create();
-//            FileOutputStream fOut = openFileOutput("notebook", Context.MODE_APPEND);
         File file = new File(this.getFilesDir(), "notebook.json");
         try {
             FileWriter fileWriter = new FileWriter(file);
             String notesToJson = gson.toJson(appData.getNotes());
             fileWriter.write(notesToJson);
             fileWriter.flush();
-//            for (Note note : appData.getNotes()) {
-//
-//            }
         } catch (IOException e) {
             e.printStackTrace();
         }

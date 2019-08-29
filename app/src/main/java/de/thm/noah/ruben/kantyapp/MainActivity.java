@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         appData = new AppData();
 
+        // lade Daten wenn welche vorhanden sind
         if (loadData(savedInstanceState)) {
             Intent intent = new Intent(this, NoteViewActivity.class);
             intent.putExtra(ValueKey.APP_DATA, appData);
@@ -45,16 +46,17 @@ public class MainActivity extends AppCompatActivity {
     }
 
     /**
-     * Diese Methode läd alle Daten in den Speicher
+     * Diese Methode läd alle Daten in den Speicher. Aus aus der Default-Datei.
      *
-     * @param savedInstanceState
+     * @param savedInstanceState das Bundle
+     *
+     * @return der boolean gibt an ob das laden Erfolgreich war.
      */
     private boolean loadData(Bundle savedInstanceState) {
         File file = new File(this.getFilesDir(), "notebook.json");
         GsonBuilder builder = new GsonBuilder();
         Gson gson = builder.create();
-        Type listType = new TypeToken<List<Note>>() {
-        }.getType();
+        Type listType = new TypeToken<List<Note>>() {}.getType();
         try {
             FileInputStream fis = new FileInputStream(file);
             byte[] data = new byte[(int) file.length()];
@@ -65,10 +67,13 @@ public class MainActivity extends AppCompatActivity {
             appData.setNotes(notes);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+            return false;
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
+            return false;
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }
         return true;
     }
