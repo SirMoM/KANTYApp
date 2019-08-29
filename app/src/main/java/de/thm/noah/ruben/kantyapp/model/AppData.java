@@ -105,6 +105,7 @@ public class AppData implements java.io.Serializable {
         if (uniqueIDs.contains(randInt)) {
             return generateNewID();
         } else {
+            uniqueIDs.add(randInt);
             return randInt;
         }
     }

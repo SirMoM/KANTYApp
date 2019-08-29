@@ -1,7 +1,5 @@
 package de.thm.noah.ruben.kantyapp.model;
 
-import androidx.appcompat.widget.AppCompatTextView;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -25,11 +23,19 @@ public class AppDataTest {
 
     @Test
     public void generateNewIDLoopTest() {
-        int newID = 0;
-        for (int i = 0; i < 100; i++) {
-            newID = classToTest.generateNewID();
+
+        ArrayList<Integer> ints = new ArrayList<>();
+        for (int i = 0; i < 100000; i++) {
+            int newID = classToTest.generateNewID();
+            if (ints.contains(newID)) {
+                System.out.println(classToTest);
+                fail(i + ". entry was not unique: " + newID );
+            }
+            ints.add(newID);
         }
-        assertFalse(classToTest.getUniqueIDs().contains(newID));
+//
+
+//        assertFalse(classToTest.getUniqueIDs().contains(newID));
     }
 
     @Test
