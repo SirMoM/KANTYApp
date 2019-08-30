@@ -20,6 +20,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.Date;
 
 import de.thm.noah.ruben.kantyapp.model.AppData;
@@ -79,12 +80,20 @@ public class NoteEditActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        TextView note_text_view = findViewById(R.id.note);
+        handleAppDataUpdate();
 
+        Intent newNoteIntent = new Intent(this, NoteViewActivity.class);
+        newNoteIntent.putExtra(ValueKey.APP_DATA, appData);
+        startActivity(newNoteIntent);
+        finish();
+    }
+
+    private void handleAppDataUpdate() {
+        TextView note_text_view = findViewById(R.id.note);
         if (editExistingNote && !deleteNote) {
             note.setText(note_text_view.getText().toString());
         } else if (editExistingNote && deleteNote) {
-            if (appData.removeNote(note.getID())){
+            if (appData.removeNote(note.getID())) {
                 Toast.makeText(this, "Note deleted!", Toast.LENGTH_SHORT).show();
             }
         } else if (!editExistingNote && !deleteNote) {
@@ -92,12 +101,7 @@ public class NoteEditActivity extends AppCompatActivity {
         } else if (!editExistingNote && deleteNote) {
             // nothing happens because than the new note isn't saved
         }
-
-
-        Intent newNoteIntent = new Intent(this, NoteViewActivity.class);
-        newNoteIntent.putExtra(ValueKey.APP_DATA, appData);
-        startActivity(newNoteIntent);
-        finish();
+        appData.saveNotesToFile(getFilesDir());
     }
 
     @Override
@@ -117,7 +121,7 @@ public class NoteEditActivity extends AppCompatActivity {
                 onBackPressed();
                 return true;
             case R.id.save_menu_item:
-                appData.saveNotesToFile(this.getFilesDir());
+                handleAppDataUpdate();
                 Toast.makeText(this, "Note(s) saved!", Toast.LENGTH_SHORT).show();
                 return true;
             case R.id.add_reminder_menu_item:
@@ -147,30 +151,30 @@ public class NoteEditActivity extends AppCompatActivity {
         LocalDateTime now = LocalDateTime.now();
         LayoutInflater inflater = getLayoutInflater();
 
-        View view = inflater.inflate(R.layout.timepicker_header, null);
-
+        View header = inflater.inflate(R.layout.timepicker_header, null);
 
         TimePickerDialog builder = new TimePickerDialog(this, R.style.DialogTheme, new TimePickerDialog.OnTimeSetListener() {
 
-                    @Override
-                    public void onTimeSet(TimePicker timePicker, int hour, int min) {
-                        System.out.println(hour + " " + min);
-                        notificationDateTimeCache = notificationDateTimeCache.withHour(hour);
-                        notificationDateTimeCache = notificationDateTimeCache.withMinute(min);
+            @Override
+            public void onTimeSet(TimePicker timePicker, int hour, int min) {
+                System.out.println(hour + " " + min);
+                notificationDateTimeCache = notificationDateTimeCache.withHour(hour);
+                notificationDateTimeCache = notificationDateTimeCache.withMinute(min);
+                notificationDateTimeCache = notificationDateTimeCache.withSecond(0);
+                notificationDateTimeCache = notificationDateTimeCache.withNano(0);
 
-                        Notification notification = NotificationHandler.getNotification(NoteEditActivity.this, note.getText());
-                        NotificationHandler.scheduleNotification(NoteEditActivity.this, notification,notificationDateTimeCache);
-                    }
+                Notification notification = NotificationHandler.getNotification(NoteEditActivity.this, notificationDateTimeCache.toString());
+                NotificationHandler.scheduleNotification(NoteEditActivity.this, notification, Date.from( notificationDateTimeCache.atZone( ZoneId.systemDefault()).toInstant()));
+            }
 
-                }, now.getHour(), now.getMinute(), true);
-        builder.setOnCancelListener(x->{
+        }, now.getHour(), now.getMinute(), true);
+        builder.setOnCancelListener(x -> {
             //TODO TOAST????
         });
-        builder.setCustomTitle(view);
-
+        builder.setCustomTitle(header);
         builder.show();
-
     }
+
     private void showDatePickerDialog() {
         LocalDate today = LocalDate.now();
 
@@ -179,18 +183,20 @@ public class NoteEditActivity extends AppCompatActivity {
             public void onDateSet(DatePicker datePicker, int i, int i1, int i2) {
                 System.out.println(i + " " + i1 + " " + i2);
                 notificationDateTimeCache = notificationDateTimeCache.withYear(i);
-                notificationDateTimeCache = notificationDateTimeCache.withMonth(i1);
+                // monate von 0-11 ihr ficker
+                notificationDateTimeCache = notificationDateTimeCache.withMonth(i1+1);
                 notificationDateTimeCache = notificationDateTimeCache.withDayOfMonth(i2);
                 showTimePickerDialog();
             }
         };
-
-            LayoutInflater inflater = getLayoutInflater();
-            View header = inflater.inflate(R.layout.timepicker_header, null);
-            DatePickerDialog builder = new DatePickerDialog(this, R.style.DialogTheme, onDateSetListener , today.getYear(), today.getMonthValue(), today.getDayOfMonth());
-            builder.setCustomTitle(header);
-            builder.show();
-        }
+        System.out.println(today.getMonthValue() + " today month");
+        LayoutInflater inflater = getLayoutInflater();
+        View header = inflater.inflate(R.layout.timepicker_header, null);
+        // TODO DOKU monate fangen hier mit 0 an i guess
+        DatePickerDialog builder = new DatePickerDialog(this, R.style.DialogTheme, onDateSetListener, today.getYear(), today.getMonthValue() - 1, today.getDayOfMonth());
+        builder.setCustomTitle(header);
+        builder.show();
+    }
 
 }
 

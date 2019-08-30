@@ -19,13 +19,11 @@
         style="@style/AppTheme.AppBarOverlay"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
-        android:layout_gravity="bottom"
+        android:layout_gravity="bottom|fill_horizontal"
         android:background="?attr/colorPrimary"
         android:backgroundTint="#009688"
-        android:clipToPadding="false"
-        android:fitsSystemWindows="true"
-        android:paddingLeft="8dip"
-        android:paddingRight="8dip"
-        app:collapseIcon="@android:drawable/arrow_down_float" />
+        android:fitsSystemWindows="false"
+        app:collapseIcon="@android:drawable/arrow_down_float"
+        app:fabAlignmentMode="center" />
     <!--        app:popupTheme="@style/AppTheme.PopupOverlay"-->
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

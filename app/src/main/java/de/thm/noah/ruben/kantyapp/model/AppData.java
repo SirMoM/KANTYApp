@@ -168,6 +168,7 @@ public class AppData implements java.io.Serializable {
             String notesToJson = gson.toJson(getNotes());
             fileWriter.write(notesToJson);
             fileWriter.flush();
+            fileWriter.close();
         } catch (IOException e) {
             e.printStackTrace();
         }

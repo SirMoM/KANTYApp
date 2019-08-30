@@ -12,11 +12,9 @@ import android.os.Build;
 
 import androidx.core.app.NotificationCompat;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
+import java.util.Date;
 
 import de.thm.noah.ruben.kantyapp.R;
-import de.thm.noah.ruben.kantyapp.model.AppData;
 
 
 /**
@@ -35,7 +33,7 @@ public class NotificationHandler extends BroadcastReceiver {
      * @param context      Die sendende Aktivität
      * @param notification Die "Notification" die eingeplant werden soll
      */
-    public static void scheduleNotification(Context context, Notification notification, LocalDateTime dateTime) {
+    public static void scheduleNotification(Context context, Notification notification, Date dateTime) {
 
         // new Intend saving the information to start a new Notification
         Intent notificationIntent = new Intent(context, NotificationHandler.class);
@@ -45,15 +43,19 @@ public class NotificationHandler extends BroadcastReceiver {
         // new PendingIntent to wake this class up
         PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 
-//        long futureInMillis = dateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli() - System.currentTimeMillis();
-        long futureInMillis = System.currentTimeMillis() + 4000;
+        long futureInMillis =System.currentTimeMillis() - (new Date()).getTime();
+//        long futureInMillis = (new Date()).getTime() - dateTime.getTime();
+        System.out.println("System.currentTimeMillis() = " + System.currentTimeMillis());
+        System.out.println("dateTime.getTime() = " + dateTime.getTime());
+        System.out.println("Millis till notefication: " + futureInMillis);
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
-        alarmManager.set(AlarmManager.RTC, futureInMillis, pendingIntent);
+        alarmManager.setExact(AlarmManager.RTC, dateTime.getTime(), pendingIntent);
+//        alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + (3 * 1000), pendingIntent);
     }
 
     public static Notification getNotification(Context context, String content) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID);
-        builder.setContentTitle("Scheduled Notification");
+        builder.setContentTitle("Reminder");
         builder.setContentText(content);
         builder.setSmallIcon(R.drawable.cover);
         return builder.build();
