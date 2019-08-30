@@ -1,5 +1,11 @@
 package de.thm.noah.ruben.kantyapp.model;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -125,6 +131,12 @@ public class AppData implements java.io.Serializable {
         return null;
     }
 
+    /**
+     * Löscht die Notiz mir der zugehörigen ID.
+     *
+     * @param id die  ID der Notiz.
+     * @return gibt an ob die Notiz gelöscht werden konnte.
+     */
     public boolean removeNote(Integer id) {
         Note noteToDelete = getNoteByID(id);
         try {
@@ -140,6 +152,26 @@ public class AppData implements java.io.Serializable {
             return false;
         }
         return true;
+    }
+
+    /**
+     * Diese Methode speichert alle Notizen in eine Datei mit dem Namen "notebook".
+     *
+     * @param path der Pfad andem die Datei liegen wird.
+     */
+    public void saveNotesToFile(File path) {
+        GsonBuilder builder = new GsonBuilder();
+        Gson gson = builder.create();
+        File file = new File(path, "notebook.json");
+        try {
+            FileWriter fileWriter = new FileWriter(file);
+            String notesToJson = gson.toJson(getNotes());
+            fileWriter.write(notesToJson);
+            fileWriter.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 
 

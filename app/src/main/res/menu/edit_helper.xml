@@ -11,25 +11,25 @@
     <item
         android:id="@+id/save_menu_item"
         android:icon="@android:drawable/ic_menu_save"
-        android:orderInCategory="100"
+        android:orderInCategory="200"
         android:title="@string/save"
-        app:showAsAction="always" />
-    <item
-        android:id="@+id/add_tag_menu_item"
-        android:icon="@android:drawable/ic_menu_info_details"
-        android:orderInCategory="100"
-        android:title="@string/tag"
         app:showAsAction="always" />
     <item
         android:id="@+id/add_reminder_menu_item"
         android:icon="@android:drawable/ic_menu_recent_history"
-        android:orderInCategory="100"
+        android:orderInCategory="300"
         android:title="@string/add_reminder"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/add_tag_menu_item"
+        android:icon="@android:drawable/ic_menu_info_details"
+        android:orderInCategory="400"
+        android:title="@string/tag"
         app:showAsAction="always" />
     <item
         android:id="@+id/add_md_menu_item"
         android:icon="@android:drawable/ic_menu_more"
-        android:orderInCategory="100"
+        android:orderInCategory="500"
         android:title="@string/add_md"
         app:showAsAction="always">
             <!-- "file" submenu -->
@@ -43,13 +43,13 @@
     <item
         android:id="@+id/show_md_menu_item"
         android:icon="@android:drawable/ic_menu_agenda"
-        android:orderInCategory="100"
+        android:orderInCategory="600"
         android:title="@string/show_md"
         app:showAsAction="always" />
     <item
         android:id="@+id/share_menu_item"
         android:icon="@android:drawable/ic_menu_share"
-        android:orderInCategory="1"
+        android:orderInCategory="0"
         android:title="@string/share_note"
         app:showAsAction="always" />
 </menu>

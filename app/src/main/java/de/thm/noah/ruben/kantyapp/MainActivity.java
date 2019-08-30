@@ -1,9 +1,9 @@
 package de.thm.noah.ruben.kantyapp;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
+
+import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -12,8 +12,6 @@ import com.google.gson.reflect.TypeToken;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Type;
@@ -22,6 +20,8 @@ import java.util.List;
 import de.thm.noah.ruben.kantyapp.model.AppData;
 import de.thm.noah.ruben.kantyapp.model.Note;
 import de.thm.noah.ruben.kantyapp.model.ValueKey;
+import de.thm.noah.ruben.kantyapp.notificationes.NotificationHandler;
+
 
 /**
  * @author Noah Ruben
@@ -37,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         appData = new AppData();
 
+        NotificationHandler.createNotificationChannel(this); // create Notification channel to always  have one ?
+
         // lade Daten wenn welche vorhanden sind
         if (loadData(savedInstanceState)) {
             Intent intent = new Intent(this, NoteViewActivity.class);
@@ -49,14 +51,14 @@ public class MainActivity extends AppCompatActivity {
      * Diese Methode läd alle Daten in den Speicher. Aus aus der Default-Datei.
      *
      * @param savedInstanceState das Bundle
-     *
      * @return der boolean gibt an ob das laden Erfolgreich war.
      */
     private boolean loadData(Bundle savedInstanceState) {
         File file = new File(this.getFilesDir(), "notebook.json");
         GsonBuilder builder = new GsonBuilder();
         Gson gson = builder.create();
-        Type listType = new TypeToken<List<Note>>() {}.getType();
+        Type listType = new TypeToken<List<Note>>() {
+        }.getType();
         try {
             FileInputStream fis = new FileInputStream(file);
             byte[] data = new byte[(int) file.length()];

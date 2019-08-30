@@ -34,6 +34,8 @@ dependencies {
     // Markdown view https://github.com/falnatsheh/MarkdownView
     implementation 'us.feras.mdv:markdownview:1.1.0'
 
+    implementation 'androidx.core:core:1.0.0'
+
 
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'com.google.android.material:material:1.0.0'

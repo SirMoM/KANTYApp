@@ -205,22 +205,22 @@ public class NoteViewActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        saveNotesToFile(appData);
+        appData.saveNotesToFile(this.getFilesDir());
         moveTaskToBack(true);
     }
 
-    private void saveNotesToFile(AppData appData) {
-        GsonBuilder builder = new GsonBuilder();
-        Gson gson = builder.create();
-        File file = new File(this.getFilesDir(), "notebook.json");
-        try {
-            FileWriter fileWriter = new FileWriter(file);
-            String notesToJson = gson.toJson(appData.getNotes());
-            fileWriter.write(notesToJson);
-            fileWriter.flush();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
+//    private void saveNotesToFile(AppData appData) {
+//        GsonBuilder builder = new GsonBuilder();
+//        Gson gson = builder.create();
+//        File file = new File(this.getFilesDir(), "notebook.json");
+//        try {
+//            FileWriter fileWriter = new FileWriter(file);
+//            String notesToJson = gson.toJson(appData.getNotes());
+//            fileWriter.write(notesToJson);
+//            fileWriter.flush();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//    }
 }
