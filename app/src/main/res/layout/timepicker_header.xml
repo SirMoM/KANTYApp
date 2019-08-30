@@ -6,8 +6,8 @@
     <TextView
         android:padding="16dp"
         android:gravity="center"
-        android:textSize="20dp"
-        android:text="Remind Me @"
+        android:textSize="20sp"
+        android:text="@string/remind_me"
         android:textStyle="bold"
         android:textColor="@color/colorPrimaryDark"
         android:layout_width="match_parent"

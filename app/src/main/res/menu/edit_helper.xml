@@ -30,9 +30,9 @@
             <!-- "md" submenu -->
             <menu>
                 <item   android:id="@+id/header"
-                        android:title="test" />
+                        android:title="@string/lorem_ipsum" />
                 <item   android:id="@+id/open"
-                        android:title="eaasds" />
+                        android:title="@string/lorem_ipsum_para" />
             </menu>
     </item>
     <item

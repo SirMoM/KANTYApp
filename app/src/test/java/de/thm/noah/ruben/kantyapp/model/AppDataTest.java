@@ -7,13 +7,16 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.fail;
 
 public class AppDataTest {
 
-    AppData classToTest;
+    private AppData classToTest;
+
     @Before
-    public void setUp() throws Exception {
+    public void setUp(){
         classToTest = new AppData();
         classToTest.getNotes().add(new Note(classToTest.generateNewID(), "TEST1", new ArrayList<String>(Arrays.asList("11", "12", "13", "24")), null, new Date(), new Date()));
         classToTest.getNotes().add(new Note(classToTest.generateNewID(), "TEST2", new ArrayList<String>(Arrays.asList("21", "22", "13", "24")), null, new Date(), new Date()));
@@ -46,7 +49,7 @@ public class AppDataTest {
 
     @Test
     public void getNoteByIDTest() {
-        Integer newID = classToTest.generateNewID();
+        int newID = classToTest.generateNewID();
         Note note = new Note(newID, new Date(), "TEST5");
         classToTest.getNotes().add(note);
         assertEquals(classToTest.getNoteByID(newID), note);
@@ -56,10 +59,10 @@ public class AppDataTest {
     @Test
     public void removeNoteTest() {
         int size = classToTest.getNotes().size();
-        Integer newID = classToTest.generateNewID();
+        int newID = classToTest.generateNewID();
         Note note = new Note(newID, new Date(), "TEST5");
         classToTest.getNotes().add(note);
         classToTest.removeNote(newID);
-        assertTrue(classToTest.getNotes().size() == size);
+        assertEquals(classToTest.getNotes().size(), size);
     }
 }

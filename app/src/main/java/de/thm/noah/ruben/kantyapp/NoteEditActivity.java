@@ -22,16 +22,24 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Date;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import de.thm.noah.ruben.kantyapp.model.AppData;
 import de.thm.noah.ruben.kantyapp.model.Note;
 import de.thm.noah.ruben.kantyapp.model.ValueKey;
-import de.thm.noah.ruben.kantyapp.notificationes.NotificationHandler;
+import de.thm.noah.ruben.kantyapp.notifications.NotificationHandler;
 
 
+/**
+ * @author Noah Ruben
+ * <p>
+ * Diese Activity conntrolliert die note_edit_view.xml View.
+ * Diese stellt alle Notizen dar.
+ */
 public class NoteEditActivity extends AppCompatActivity {
 
-
+//  Dies stellt die DateTime dar, die der Benutzer eingibt.
     private LocalDateTime notificationDateTimeCache = LocalDateTime.now();
 
     private AppData appData;
@@ -46,6 +54,10 @@ public class NoteEditActivity extends AppCompatActivity {
      */
     private boolean deleteNote = false;
 
+
+    /**
+     * Die Notiz, die gerade bearbeitet wird.
+     */
     private Note note = null;
 
     @Override
@@ -57,13 +69,17 @@ public class NoteEditActivity extends AppCompatActivity {
         setSupportActionBar(editHelperBar);
 
 
-        TextView note_edit_view = (TextView) findViewById(R.id.note);
+        TextView note_edit_view = findViewById(R.id.note);
+
+//      AppData aus Intend laden
         appData = (AppData) getIntent().getSerializableExtra(ValueKey.APP_DATA);
+
+//      Wenn das Intend eine Notiz, als Extra enthält, wird die Notiz geladen
         Integer noteID = null;
         try {
             noteID = Integer.valueOf((String) getIntent().getSerializableExtra(ValueKey.NOTE_ID));
         } catch (NumberFormatException numberFormatException) {
-            System.err.println(numberFormatException);
+            System.out.println(numberFormatException);
         }
 
         if (noteID == null) {
@@ -88,20 +104,52 @@ public class NoteEditActivity extends AppCompatActivity {
         finish();
     }
 
+    /**
+     * Behandelt die verschiedenen Möglichkeiten, die auftreten können, und aktualisiert die appData entsprechend.
+     * <p>
+     * Speichern der Notiz(en)
+     * Löschen der Notiz und speichern der Notizen.
+     */
     private void handleAppDataUpdate() {
         TextView note_text_view = findViewById(R.id.note);
         if (editExistingNote && !deleteNote) {
+            preProcessingText(note_text_view.getText().toString(), note);
             note.setText(note_text_view.getText().toString());
         } else if (editExistingNote && deleteNote) {
             if (appData.removeNote(note.getID())) {
                 Toast.makeText(this, "Note deleted!", Toast.LENGTH_SHORT).show();
             }
         } else if (!editExistingNote && !deleteNote) {
+            preProcessingText(note_text_view.getText().toString(), note);
             appData.getNotes().add(new Note(appData.generateNewID(), new Date(), note_text_view.getText().toString()));
         } else if (!editExistingNote && deleteNote) {
             // nothing happens because than the new note isn't saved
         }
         appData.saveNotesToFile(getFilesDir());
+    }
+
+
+    /**
+     * Diese Methode fügt Tags und Daten aus dem Text zur Notiz hinzu.
+     *
+     * @param text Der zu verarbeitende Text
+     */
+    private void preProcessingText(String text, Note note) {
+//      TODO get tags to note
+        Pattern tagPattern = Pattern.compile("@\\w+\\s?");
+        Matcher tagMatcher = tagPattern.matcher(text);
+        if (tagMatcher.find()){
+            for (int i = 0; i < tagMatcher.groupCount(); i++) {
+                System.out.println(tagMatcher.group(i));
+            }
+        }
+        Pattern datePattern = Pattern.compile("[0-9]{2}\\.[0-9]{2}\\.[0-9]{4}");
+        Matcher dateMatcher = datePattern.matcher(text);
+        if (dateMatcher.find()){
+            for (int i = 0; i < dateMatcher.groupCount(); i++) {
+                System.out.println(dateMatcher.group(i));
+            }
+        }
     }
 
     @Override
@@ -126,7 +174,6 @@ public class NoteEditActivity extends AppCompatActivity {
                 return true;
             case R.id.add_reminder_menu_item:
 //                TODO add Reminder
-//                      * as Push-benachichtigung
 //                      * als Kalender eintrag
                 showDatePickerDialog();
 
@@ -147,10 +194,14 @@ public class NoteEditActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Shows the
+     */
     private void showTimePickerDialog() {
         LocalDateTime now = LocalDateTime.now();
         LayoutInflater inflater = getLayoutInflater();
 
+        // no real parent
         View header = inflater.inflate(R.layout.timepicker_header, null);
 
         TimePickerDialog builder = new TimePickerDialog(this, R.style.DialogTheme, new TimePickerDialog.OnTimeSetListener() {
@@ -168,13 +219,18 @@ public class NoteEditActivity extends AppCompatActivity {
             }
 
         }, now.getHour(), now.getMinute(), true);
-        builder.setOnCancelListener(x -> {
-            //TODO TOAST????
-        });
+//        builder.setOnCancelListener(x -> {
+//            //TODO TOAST????
+//        });
         builder.setCustomTitle(header);
         builder.show();
     }
 
+    /**
+     * Zeigt den DatePicker an und gibt die Informationen
+     * {@link NoteEditActivity#notificationDateTimeCache} und ruft
+     * {@link NoteEditActivity#showTimePickerDialog()} auf.
+     */
     private void showDatePickerDialog() {
         LocalDate today = LocalDate.now();
 
@@ -189,7 +245,6 @@ public class NoteEditActivity extends AppCompatActivity {
                 showTimePickerDialog();
             }
         };
-        System.out.println(today.getMonthValue() + " today month");
         LayoutInflater inflater = getLayoutInflater();
         View header = inflater.inflate(R.layout.timepicker_header, null);
         // TODO DOKU monate fangen hier mit 0 an i guess

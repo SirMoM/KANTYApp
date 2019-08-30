@@ -158,15 +158,12 @@ public class Note implements Serializable {
     /**
      * @param tag Fügt einen Tag zu dem bestehenden tags hinzu.
      */
-    public void addTags(String tag) {
+    public void addTag(String tag) {
         this.tags.add(tag);
     }
 
 
 
-    /**
-     * @return  die String representation der Notiz
-     */
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("Note: " + id + " {");

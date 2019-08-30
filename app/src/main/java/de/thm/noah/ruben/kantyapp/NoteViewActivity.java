@@ -1,6 +1,5 @@
 package de.thm.noah.ruben.kantyapp;
 
-import android.annotation.SuppressLint;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,12 +15,7 @@ import androidx.appcompat.widget.AppCompatTextView;
 import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.List;
 
 import de.thm.noah.ruben.kantyapp.model.AppData;
@@ -29,17 +23,32 @@ import de.thm.noah.ruben.kantyapp.model.Note;
 import de.thm.noah.ruben.kantyapp.model.ValueKey;
 import us.feras.mdv.MarkdownView;
 
+/**
+ * @author Noah Ruben
+ * <p>
+ * Diese Activity conntrolliert die note_view_layout.xml View.
+ * Diese stellt alle Notizen dar.
+ */
 public class NoteViewActivity extends AppCompatActivity {
 
-    Intent newNoteIntent;
-    AppData appData;
+    private Intent newNoteIntent;
+    private AppData appData;
 
     /**
-     * Which type is shown
+     * Which View is shown:
+     * <p>
+     * true  = MarkdownView
+     * <p>
+     * false = TextView
      */
     private boolean toggleView = true;
 
+
+    /**
+     * True, wenn {@link NoteViewActivity#deleteNoteOnLongClickHandler} ausgelöst wurde, um zu verhindern, dass {@link NoteViewActivity#openNoteOnTouchHandler} ebenfalls ausgelöst wird.
+     */
     private boolean longPress = false;
+
     private View.OnClickListener openNoteOnClickHandler = new View.OnClickListener() {
 
         @Override
@@ -51,6 +60,7 @@ public class NoteViewActivity extends AppCompatActivity {
             startActivity(newNoteIntent);
         }
     };
+
     private View.OnLongClickListener deleteNoteOnLongClickHandler = new View.OnLongClickListener() {
         @Override
         public boolean onLongClick(View view) {
@@ -60,6 +70,9 @@ public class NoteViewActivity extends AppCompatActivity {
         }
     };
 
+    /**
+     * Erstellt den Löschalarm
+     */
     private void createAlert(View view) {
         final Integer ID = Integer.valueOf(view.getTransitionName());
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(NoteViewActivity.this);
@@ -102,6 +115,7 @@ public class NoteViewActivity extends AppCompatActivity {
                 startActivity(newNoteIntent);
             }
             return false;
+
         }
     };
 
@@ -129,23 +143,22 @@ public class NoteViewActivity extends AppCompatActivity {
         FloatingActionButton addNoteButton = findViewById(R.id.addNote);
         addNoteButton.setOnClickListener(this.openNoteOnClickHandler);
 
-
-//                new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                startActivity(newNoteIntent);
-//            }
-//        });
-
         populateNoteView(appData.getNotes());
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.my_main, menu);
+        return true;
+    }
+
     /**
-     * Diese Methode erzeugr die anklickbaren widgets in der übersicht.
+     * Diese Methode erzeugt die anklickbaren Views in der Übersicht.
      *
      * @param notes alle notizen der App
      */
-    @SuppressLint("ClickableViewAccessibility")
     private void populateNoteView(List<Note> notes) {
         LinearLayout view = findViewById(R.id.contendLayout);
 //        view.removeAllViewsInLayout();
@@ -153,7 +166,7 @@ public class NoteViewActivity extends AppCompatActivity {
 
         for (Note note : notes) {
             AppCompatTextView sep = new AppCompatTextView(NoteViewActivity.this);
-            sep.setText("_______________________________");
+            sep.setText(R.string.separator);
             view.addView(sep);
             if (toggleView) {
                 MarkdownView markdownView = new MarkdownView(this);
@@ -174,14 +187,6 @@ public class NoteViewActivity extends AppCompatActivity {
                 view.addView(textView);
             }
         }
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        super.onCreateOptionsMenu(menu);
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.my_main, menu);
-        return true;
     }
 
     @Override
@@ -207,20 +212,6 @@ public class NoteViewActivity extends AppCompatActivity {
     public void onBackPressed() {
         appData.saveNotesToFile(this.getFilesDir());
         moveTaskToBack(true);
+//        super.onBackPressed();
     }
-
-//    private void saveNotesToFile(AppData appData) {
-//        GsonBuilder builder = new GsonBuilder();
-//        Gson gson = builder.create();
-//        File file = new File(this.getFilesDir(), "notebook.json");
-//        try {
-//            FileWriter fileWriter = new FileWriter(file);
-//            String notesToJson = gson.toJson(appData.getNotes());
-//            fileWriter.write(notesToJson);
-//            fileWriter.flush();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//
-//    }
 }

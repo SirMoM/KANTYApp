@@ -1,4 +1,4 @@
-package de.thm.noah.ruben.kantyapp.notificationes;
+package de.thm.noah.ruben.kantyapp.notifications;
 
 import android.app.AlarmManager;
 import android.app.Notification;
@@ -30,6 +30,8 @@ public class NotificationHandler extends BroadcastReceiver {
     public static final String CHANNEL_DESCRIPTION = "Channel for the KANTYApp";
 
     /**
+     * Plant eine Benachrichtigung zum angegebenen Datum ein.
+     *
      * @param context      Die sendende Aktivität
      * @param notification Die "Notification" die eingeplant werden soll
      */
@@ -53,6 +55,14 @@ public class NotificationHandler extends BroadcastReceiver {
 //        alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + (3 * 1000), pendingIntent);
     }
 
+    /**
+     * Erstellt eine neue Notifikation
+     *
+     * @param context der Kontext der Notifikation
+     * @param content Die Mitteilungen der Notifikation
+     *
+     * @return die Notifikation
+     */
     public static Notification getNotification(Context context, String content) {
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID);
         builder.setContentTitle("Reminder");
@@ -62,6 +72,12 @@ public class NotificationHandler extends BroadcastReceiver {
     }
 
 
+    /**
+     * Empfängt den Intend der vom AlarmManager gesendet wird. Und erstellt eine Notifikation daraus.// TODO auch nach nem restart.
+     *
+     * @param context der Kontext
+     * @param intent der Intend der empfangen wird
+     */
     public void onReceive(Context context, Intent intent) {
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -70,15 +86,19 @@ public class NotificationHandler extends BroadcastReceiver {
         notificationManager.notify(id, notification);
     }
 
+    /**
+     * Erstellt den Notifications-Kanal für die Anwendung
+     *
+     * @param context Der Kontext
+     */
     public static void createNotificationChannel(Context context) {
         // Create the NotificationChannel, but only on API 26+ because
         // the NotificationChannel class is new and not in the support library
+        // Just to be sure
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             CharSequence name = CHANNEL_ID;
-            String description = CHANNEL_DESCRIPTION;
-            int importance = NotificationManager.IMPORTANCE_DEFAULT;
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, name, NotificationManager.IMPORTANCE_HIGH);
-            channel.setDescription(description);
+            channel.setDescription(CHANNEL_DESCRIPTION);
 
             // Register the channel with the system; you can't change the importance
             // or other notification behaviors after this

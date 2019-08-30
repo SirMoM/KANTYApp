@@ -20,16 +20,17 @@ import java.util.List;
 import de.thm.noah.ruben.kantyapp.model.AppData;
 import de.thm.noah.ruben.kantyapp.model.Note;
 import de.thm.noah.ruben.kantyapp.model.ValueKey;
-import de.thm.noah.ruben.kantyapp.notificationes.NotificationHandler;
+import de.thm.noah.ruben.kantyapp.notifications.NotificationHandler;
 
 
 /**
  * @author Noah Ruben
  * <p>
- * Das ist der Main Controller der App
+ * Das ist der "Loading-Screen"-Controller der App
  */
 public class MainActivity extends AppCompatActivity {
-    AppData appData;
+
+    private AppData appData;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,15 +51,16 @@ public class MainActivity extends AppCompatActivity {
     /**
      * Diese Methode läd alle Daten in den Speicher. Aus aus der Default-Datei.
      *
-     * @param savedInstanceState das Bundle
-     * @return der boolean gibt an ob das laden Erfolgreich war.
+     * @param savedInstanceState Das Bundle
+     * @return Gibt an ob das laden der Daten erfolgreich war.
      */
     private boolean loadData(Bundle savedInstanceState) {
+//      Lade die Daten vom Standard-Speicherplatz
         File file = new File(this.getFilesDir(), "notebook.json");
         GsonBuilder builder = new GsonBuilder();
         Gson gson = builder.create();
-        Type listType = new TypeToken<List<Note>>() {
-        }.getType();
+//      Token für den JSON-Parser damit er eine Liste parsen kann
+        Type listType = new TypeToken<List<Note>>() {}.getType();
         try {
             FileInputStream fis = new FileInputStream(file);
             byte[] data = new byte[(int) file.length()];
