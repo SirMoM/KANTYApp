@@ -1,16 +1,16 @@
 package de.thm.noah.ruben.kantyapp;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.text.util.Linkify;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import de.thm.noah.ruben.kantyapp.model.AppData;
 import de.thm.noah.ruben.kantyapp.model.Note;
@@ -29,6 +29,10 @@ public class NoteEditActivity extends AppCompatActivity {
         System.out.println("NoteEditActivity.onCreate");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.note_edit_view);
+        Toolbar editHelperBar = findViewById(R.id.editHelperBar);
+        setSupportActionBar(editHelperBar);
+
+
         TextView note_edit_view = (TextView) findViewById(R.id.note);
         appData = (AppData) getIntent().getSerializableExtra(ValueKey.APP_DATA);
         Integer noteID = null;
@@ -63,6 +67,26 @@ public class NoteEditActivity extends AppCompatActivity {
         newNoteIntent.putExtra(ValueKey.APP_DATA, appData);
         startActivity(newNoteIntent);
         finish();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.edit_helper, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle item selection
+        switch (item.getItemId()) {
+            case R.id.toggleView:
+                System.out.println("piazsgdf");
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
     }
 }
 

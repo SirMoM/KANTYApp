@@ -11,4 +11,10 @@
     <string name="delete_msg">Are you sure you want to delete this entry?</string>
     <string name="delete">Delete</string>
     <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="show_md">Show MD</string>
+    <string name="add_md">Add MD string</string>
+    <string name="add_reminder">Add reminder</string>
+    <string name="tag">Add tag</string>
+    <string name="share_note">Share</string>
 </resources>
