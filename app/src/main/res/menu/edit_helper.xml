@@ -30,9 +30,31 @@
             <!-- "md" submenu -->
             <menu>
                 <item   android:id="@+id/header"
-                        android:title="@string/lorem_ipsum" />
-                <item   android:id="@+id/open"
-                        android:title="@string/lorem_ipsum_para" />
+                        android:title="@string/headers">
+                        <menu>
+                            <item   android:id="@+id/h1"
+                                    android:title="H1"/>
+                            <item   android:id="@+id/h2"
+                                    android:title="H2"/>
+                            <item   android:id="@+id/h3"
+                                    android:title="H3"/>
+                            <item   android:id="@+id/h4"
+                                    android:title="H4"/>
+                            <item   android:id="@+id/h5"
+                                    android:title="H5"/>
+                        </menu>
+                </item>
+
+                <item   android:id="@+id/h_rule"
+                        android:title="@string/h_rule" />
+                <item   android:id="@+id/date"
+                        android:title="@string/date" />
+                <item   android:id="@+id/tag"
+                        android:title="@string/tag" />
+                <item   android:id="@+id/bold"
+                        android:title="@string/bold" />
+                <item   android:id="@+id/italic"
+                        android:title="@string/italic" />
             </menu>
     </item>
     <item
@@ -45,5 +67,5 @@
         android:icon="@android:drawable/ic_menu_share"
         android:title="@string/share_note"
         android:orderInCategory="0"
-        app:showAsAction="always" />
+        app:showAsAction="always"/>
 </menu>

@@ -14,11 +14,20 @@
     <string name="show_md">Show MD</string>
     <string name="add_md">Add MD string</string>
     <string name="add_reminder">Add reminder</string>
+    <string name="add_reminder_msg">Add a reminder at</string>
     <string name="tag">Add tag</string>
     <string name="share_note">Share</string>
     <string name="load_pic">loadPic</string>
     <string name="lorem_ipsum">Lorem ipsum</string>
     <string name="lorem_ipsum_para">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur facilisis nibh nec tincidunt viverra. Orci varius natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Integer varius sapien mi, a pulvinar tellus gravida in. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec sagittis et diam eu tempus. Suspendisse bibendum egestas elementum. Duis euismod turpis quis finibus volutpat.</string>
     <string name="remind_me">Remind Me @</string>
-    <string name="separator">_______________________________</string>
+    <string name="OK">Ok</string>
+    <string name="headers">Headers</string>
+    <string name="h_rule">Horizontal rule</string>
+    <string name="date">Date</string>
+    <string name="bold">Bold</string>
+    <string name="italic">Italics</string>
+    <string name="action_show_tag_x">Show notes with tag</string>
+    <string name="action_reset">Reset List</string>
+    <string name="show_text">Show text</string>
 </resources>

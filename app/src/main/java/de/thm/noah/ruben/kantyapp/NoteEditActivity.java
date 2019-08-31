@@ -3,6 +3,7 @@ package de.thm.noah.ruben.kantyapp;
 import android.app.DatePickerDialog;
 import android.app.Notification;
 import android.app.TimePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.util.Linkify;
@@ -11,13 +12,18 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.DatePicker;
-import android.widget.TextView;
+import android.widget.EditText;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 
+import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -29,6 +35,7 @@ import de.thm.noah.ruben.kantyapp.model.AppData;
 import de.thm.noah.ruben.kantyapp.model.Note;
 import de.thm.noah.ruben.kantyapp.model.ValueKey;
 import de.thm.noah.ruben.kantyapp.notifications.NotificationHandler;
+import de.thm.noah.ruben.kantyapp.views.MarkdownWebView;
 
 
 /**
@@ -39,7 +46,7 @@ import de.thm.noah.ruben.kantyapp.notifications.NotificationHandler;
  */
 public class NoteEditActivity extends AppCompatActivity {
 
-//  Dies stellt die DateTime dar, die der Benutzer eingibt.
+    //  Dies stellt die DateTime dar, die der Benutzer eingibt.
     private LocalDateTime notificationDateTimeCache = LocalDateTime.now();
 
     private AppData appData;
@@ -60,6 +67,10 @@ public class NoteEditActivity extends AppCompatActivity {
      */
     private Note note = null;
 
+    private boolean showMd = true;
+    private MarkdownWebView markdownWebView;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         System.out.println("NoteEditActivity.onCreate");
@@ -69,7 +80,7 @@ public class NoteEditActivity extends AppCompatActivity {
         setSupportActionBar(editHelperBar);
 
 
-        TextView note_edit_view = findViewById(R.id.note);
+        EditText note_edit_view = findViewById(R.id.note);
 
 //      AppData aus Intend laden
         appData = (AppData) getIntent().getSerializableExtra(ValueKey.APP_DATA);
@@ -83,7 +94,12 @@ public class NoteEditActivity extends AppCompatActivity {
         }
 
         if (noteID == null) {
-            note_edit_view.setText("# Keep a Note to Yourself \n Noah Ruben");
+            Serializable extra = getIntent().getSerializableExtra(ValueKey.NOTE_TEXT);
+            if (extra != null){
+                note_edit_view.setText((String) extra);
+            }else {
+                note_edit_view.setText("# Keep a Note to Yourself \n Noah Ruben");
+            }
             editExistingNote = false;
         } else {
             note = appData.getNoteByID(noteID);
@@ -98,6 +114,13 @@ public class NoteEditActivity extends AppCompatActivity {
     public void onBackPressed() {
         handleAppDataUpdate();
 
+        goToNoteViewActivity();
+    }
+
+    /**
+     * creates and sends the Intend to change views to NoteView TODO GERMAN
+     */
+    private void goToNoteViewActivity() {
         Intent newNoteIntent = new Intent(this, NoteViewActivity.class);
         newNoteIntent.putExtra(ValueKey.APP_DATA, appData);
         startActivity(newNoteIntent);
@@ -111,7 +134,7 @@ public class NoteEditActivity extends AppCompatActivity {
      * Löschen der Notiz und speichern der Notizen.
      */
     private void handleAppDataUpdate() {
-        TextView note_text_view = findViewById(R.id.note);
+        EditText note_text_view = findViewById(R.id.note);
         if (editExistingNote && !deleteNote) {
             preProcessingText(note_text_view.getText().toString(), note);
             note.setText(note_text_view.getText().toString());
@@ -120,8 +143,9 @@ public class NoteEditActivity extends AppCompatActivity {
                 Toast.makeText(this, "Note deleted!", Toast.LENGTH_SHORT).show();
             }
         } else if (!editExistingNote && !deleteNote) {
+            note = new Note(appData.generateNewID(), new Date(), note_text_view.getText().toString());
             preProcessingText(note_text_view.getText().toString(), note);
-            appData.getNotes().add(new Note(appData.generateNewID(), new Date(), note_text_view.getText().toString()));
+            appData.getNotes().add(note);
         } else if (!editExistingNote && deleteNote) {
             // nothing happens because than the new note isn't saved
         }
@@ -136,20 +160,69 @@ public class NoteEditActivity extends AppCompatActivity {
      */
     private void preProcessingText(String text, Note note) {
 //      TODO get tags to note
-        Pattern tagPattern = Pattern.compile("@\\w+\\s?");
+        Pattern tagPattern = Pattern.compile("\\$\\w+\\s?");
         Matcher tagMatcher = tagPattern.matcher(text);
-        if (tagMatcher.find()){
-            for (int i = 0; i < tagMatcher.groupCount(); i++) {
-                System.out.println(tagMatcher.group(i));
+        while (tagMatcher.find()) {
+            String tagString = tagMatcher.group().substring(1);
+            System.out.println("tagString = " + tagString);
+            appData.getUniqueTags().add(tagString);
+            if (note.addTagToNote(tagString)) {
+                Toast.makeText(this, "Added " + tagString + "-Tag to note!", Toast.LENGTH_LONG).show();
             }
         }
-        Pattern datePattern = Pattern.compile("[0-9]{2}\\.[0-9]{2}\\.[0-9]{4}");
-        Matcher dateMatcher = datePattern.matcher(text);
-        if (dateMatcher.find()){
-            for (int i = 0; i < dateMatcher.groupCount(); i++) {
-                System.out.println(dateMatcher.group(i));
+
+        // Create a Reminder from the note Text if wanted
+        Pattern dateTimePattern = Pattern.compile("<[0-9]{2}\\.[0-9]{2}\\.[0-9]{4}(@[0-9]{2}:[0-9]{2})?");
+        Matcher dateTimeMatcher = dateTimePattern.matcher(text);
+        SimpleDateFormat dTF = new SimpleDateFormat("dd.MM.yyyy@kk:mm");
+        SimpleDateFormat dF = new SimpleDateFormat("dd.MM.yyyy");
+        while (dateTimeMatcher.find()) {
+            Date date = null;
+            try {
+                date = dTF.parse(dateTimeMatcher.group());
+                System.out.println("\t \t \t \t \t \t \t DTF = " + date);
+            } catch (ParseException e) {
+//                e.printStackTrace();
+            }
+            if (date == null) {
+                try {
+                    date = dF.parse(dateTimeMatcher.group());
+                    System.out.println("\t \t \t \t \t \t \t DF = " + date);
+                } catch (ParseException e) {
+//                e.printStackTrace();
+                }
+            }
+//            createAddReminderAlert(date);
+            System.out.println("dateTimeMatcher.group() = " + dateTimeMatcher.group());
+            boolean b = note.addReminderDate(dateTimeMatcher.group());
+            if (b && date != null){
+                Notification notification = NotificationHandler.getNotification(NoteEditActivity.this, note.getText());
+                NotificationHandler.scheduleNotification(NoteEditActivity.this, notification, date);
+                Toast.makeText(this, "Created " + dTF.format(date) + " Notification for this note!", Toast.LENGTH_LONG).show();
             }
         }
+    }
+    /**
+     * Erstellt die "Benachrichtigung hinzufügen"-Warnung
+     */
+    private void createAddReminderAlert(Date date) {
+        AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(this);
+        alertDialogBuilder.setTitle(R.string.add_reminder);
+        alertDialogBuilder.setMessage(" " + R.string.add_reminder_msg + (new SimpleDateFormat("dd.MM.yyyy@kk:mm")).format(date));
+        alertDialogBuilder.setPositiveButton(R.string.OK, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                Notification notification = NotificationHandler.getNotification(NoteEditActivity.this, note.getText());
+                NotificationHandler.scheduleNotification(NoteEditActivity.this, notification, date);
+            }
+        });
+        alertDialogBuilder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                return;
+            }
+        });
+//        alertDialogBuilder.create().show();
     }
 
     @Override
@@ -162,6 +235,7 @@ public class NoteEditActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        EditText tv = findViewById(R.id.note);
         // Handle item selection
         switch (item.getItemId()) {
             case R.id.delete_menu_item:
@@ -171,27 +245,116 @@ public class NoteEditActivity extends AppCompatActivity {
             case R.id.save_menu_item:
                 handleAppDataUpdate();
                 Toast.makeText(this, "Note(s) saved!", Toast.LENGTH_SHORT).show();
+                editExistingNote = true;
                 return true;
             case R.id.add_reminder_menu_item:
 //                TODO add Reminder
 //                      * als Kalender eintrag
                 showDatePickerDialog();
-
                 return true;
             case R.id.add_tag_menu_item:
 //                TODO add Alert to fill in TAG (Auto complete?)
                 return true;
-//            case R.id.add_md_menu_item: TODO real sub points actions
-//                return true;
+            case R.id.h1:
+                addMdBefore(tv, ValueKey.H1);
+                return true;
+            case R.id.h2:
+                addMdBefore(tv, ValueKey.H2);
+                return true;
+            case R.id.h3:
+                addMdBefore(tv, ValueKey.H3);
+                return true;
+            case R.id.h4:
+                addMdBefore(tv, ValueKey.H4);
+                return true;
+            case R.id.h5:
+                addMdBefore(tv, ValueKey.H5);
+                return true;
+            case R.id.h_rule:
+                addMdAfter(tv, ValueKey.H_RULE);
+                return true;
+            case R.id.date:
+                addMdBefore(tv, ValueKey.DATE);
+                return true;
+            case R.id.tag:
+                addMdBefore(tv, ValueKey.TAG);
+                return true;
+            case R.id.bold:
+                addMdBeforeAfter(tv, ValueKey.BOLD);
+                return true;
+            case R.id.italic:
+                addMdBeforeAfter(tv, ValueKey.ITALIC);
+                return true;
             case R.id.show_md_menu_item:
 //                TODO add WebView and Markdown-Parser make this the default thing?
+
+                CoordinatorLayout layout = findViewById(R.id.layout);
+
+                EditText view = findViewById(R.id.note);
+                if (showMd){
+                    view.setVisibility(View.GONE);
+                    markdownWebView = new MarkdownWebView(this, view.getText().toString());
+                    layout.addView(markdownWebView);
+                    item.setTitle(R.string.show_text);
+                    showMd = false;
+                }else {
+                    view.setVisibility(View.VISIBLE);
+                    layout.removeView(markdownWebView);
+                    item.setTitle(R.string.show_md);
+                    showMd = true;
+                }
+
+
+
                 return true;
             case R.id.share_menu_item:
-//                TODO add share dialog
+                Intent share = new Intent(android.content.Intent.ACTION_SEND);
+                share.setType("text/plain");
+
+                // Add data to the intent, the receiving app will decide
+                // what to do with it.
+                share.putExtra(Intent.EXTRA_SUBJECT, "Note: " + note.getID());
+                share.putExtra(Intent.EXTRA_TEXT, note.getText());
+
+                startActivity(Intent.createChooser(share, "Share note!"));
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void addMdBefore(EditText tv, String textToInsert) {
+        int start = Math.max(tv.getSelectionStart(), 0);
+        int end = Math.max(tv.getSelectionEnd(), 0);
+        String text = tv.getText().toString();
+        String selectedText = text.substring(Math.min(start, end), Math.max(start, end));
+        String firstTextHalf = text.substring(0, start);
+        String lastTextHalf = text.substring(end);
+        textToInsert = textToInsert + selectedText;
+        tv.setText(firstTextHalf + textToInsert + lastTextHalf);
+        tv.setSelection(start);
+    }
+    private void addMdAfter(EditText tv, String textToInsert) {
+        int start = Math.max(tv.getSelectionStart(), 0);
+        int end = Math.max(tv.getSelectionEnd(), 0);
+        String text = tv.getText().toString();
+        String selectedText = text.substring(Math.min(start, end), Math.max(start, end));
+        String firstTextHalf = text.substring(0, start);
+        String lastTextHalf = text.substring(end);
+        textToInsert = selectedText + textToInsert;
+        tv.setText(firstTextHalf + textToInsert + lastTextHalf);
+        tv.setSelection(start);
+    }
+    private void addMdBeforeAfter(EditText tv, String textToInsert) {
+        int start = Math.max(tv.getSelectionStart(), 0);
+        int end = Math.max(tv.getSelectionEnd(), 0);
+        String text = tv.getText().toString();
+        String selectedText = text.substring(Math.min(start, end), Math.max(start, end));
+        String firstTextHalf = text.substring(0, start);
+        String lastTextHalf = text.substring(end);
+        textToInsert = textToInsert + selectedText + textToInsert;
+        tv.setText(firstTextHalf + textToInsert + lastTextHalf);
+        tv.setSelection(start);
     }
 
     /**
@@ -215,7 +378,7 @@ public class NoteEditActivity extends AppCompatActivity {
                 notificationDateTimeCache = notificationDateTimeCache.withNano(0);
 
                 Notification notification = NotificationHandler.getNotification(NoteEditActivity.this, notificationDateTimeCache.toString());
-                NotificationHandler.scheduleNotification(NoteEditActivity.this, notification, Date.from( notificationDateTimeCache.atZone( ZoneId.systemDefault()).toInstant()));
+                NotificationHandler.scheduleNotification(NoteEditActivity.this, notification, Date.from(notificationDateTimeCache.atZone(ZoneId.systemDefault()).toInstant()));
             }
 
         }, now.getHour(), now.getMinute(), true);
@@ -240,7 +403,7 @@ public class NoteEditActivity extends AppCompatActivity {
                 System.out.println(i + " " + i1 + " " + i2);
                 notificationDateTimeCache = notificationDateTimeCache.withYear(i);
                 // monate von 0-11 ihr ficker
-                notificationDateTimeCache = notificationDateTimeCache.withMonth(i1+1);
+                notificationDateTimeCache = notificationDateTimeCache.withMonth(i1 + 1);
                 notificationDateTimeCache = notificationDateTimeCache.withDayOfMonth(i2);
                 showTimePickerDialog();
             }

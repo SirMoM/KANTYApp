@@ -73,7 +73,7 @@ public class NotificationHandler extends BroadcastReceiver {
 
 
     /**
-     * Empfängt den Intend der vom AlarmManager gesendet wird. Und erstellt eine Notifikation daraus.// TODO auch nach nem restart.
+     * Empfängt den Intend der vom AlarmManager gesendet wird. Und erstellt eine Notifikation daraus.// TODO auch nach nem restart?
      *
      * @param context der Kontext
      * @param intent der Intend der empfangen wird

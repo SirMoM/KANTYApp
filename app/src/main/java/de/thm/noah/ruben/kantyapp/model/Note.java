@@ -3,7 +3,9 @@ package de.thm.noah.ruben.kantyapp.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * @author Noah Ruben
@@ -30,6 +32,11 @@ public class Note implements Serializable {
     private List<String> tags;
 
     /**
+     * Alle Daten und Uhrzeiten, wann eine Benachrichtigung für diese Notiz eintrifft
+     */
+    private Set<String> reminderDates;
+
+    /**
      * Pfad zur notiz (mit ggf. Pseudo-Ordnern usw)
      */
     private String path;
@@ -54,6 +61,7 @@ public class Note implements Serializable {
         this.path = path;
         this.creationDate = creationDate;
         this.tags = new ArrayList<String>();
+        this.reminderDates = new HashSet<String>();
     }
 
     /**
@@ -66,20 +74,23 @@ public class Note implements Serializable {
         this.text = text;
         this.creationDate = creationDate;
         this.tags = new ArrayList<String>();
+        this.reminderDates = new HashSet<String>();
     }
 
     /**
      * @param id die ID der Notiz
      * @param text der Text der Notiz
      * @param tags die Tags der Notiz
+     * @param reminderDates die Notifikation's Zeitpunkte der Notiz
      * @param path der Pfad der Notiz
      * @param creationDate der Zeitpunkt der Erstellung der  Notiz
      * @param modifyDate der Zeitpunkt der letzten Bearbeitung der  Notiz
      */
-    public Note(int id, String text, List<String> tags, String path, Date creationDate, Date modifyDate) {
+    public Note(int id, String text, List<String> tags, Set<String> reminderDates, String path, Date creationDate, Date modifyDate) {
         this.id = id;
         this.text = text;
         this.tags = tags;
+        this.reminderDates = reminderDates;
         this.path = path;
         this.creationDate = creationDate;
         this.modifyDate = modifyDate;
@@ -155,15 +166,6 @@ public class Note implements Serializable {
         return id;
     }
 
-    /**
-     * @param tag Fügt einen Tag zu dem bestehenden tags hinzu.
-     */
-    public void addTag(String tag) {
-        this.tags.add(tag);
-    }
-
-
-
     @Override
     public String toString() {
         final StringBuilder sb = new StringBuilder("Note: " + id + " {");
@@ -174,5 +176,43 @@ public class Note implements Serializable {
         sb.append(", modifyDate=").append(modifyDate);
         sb.append('}');
         return sb.toString();
+    }
+
+    /**
+     * @return alle Benachichtigungs Zeitpunkte
+     */
+    public Set<String> getReminderDates() {
+        return reminderDates;
+    }
+
+    /**
+     * @param reminderDates setzt alle Benachrichtigung's Zeitpunkte
+     */
+    public void setReminderDates(Set<String> reminderDates) {
+        this.reminderDates = reminderDates;
+    }
+
+    /**
+     * @param reminderDate fügt ein Benachrichtigung's Zeitpunkt hinzu.
+     * @return true wenn das reminderDate erfolgreich hinzugefügt wurde.
+     */
+    public boolean addReminderDate(String reminderDate) {
+        System.out.println(reminderDates);
+        return reminderDates.add(reminderDate);
+    }
+
+    /**
+     * Fügt Tags einer Notiz hinzu wenn diese den Tag nicht schon besitzt.
+     *
+     * @param tag Fügt einen Tag zu dem bestehenden tags hinzu.
+     * @return ein Bool der angibt ob der Tag hinzugefügt wurde.
+     */
+    public boolean addTagToNote(String tag) {
+        if (!this.getTags().contains(tag)){
+            this.getTags().add(tag);
+            return true;
+        }else {
+            return false;
+        }
     }
 }

@@ -6,21 +6,27 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
+import android.view.SubMenu;
 import android.view.View;
 import android.widget.LinearLayout;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.appcompat.widget.Toolbar;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import de.thm.noah.ruben.kantyapp.model.AppData;
 import de.thm.noah.ruben.kantyapp.model.Note;
 import de.thm.noah.ruben.kantyapp.model.ValueKey;
+import de.thm.noah.ruben.kantyapp.views.MarkdownWebView;
 import us.feras.mdv.MarkdownView;
 
 /**
@@ -65,15 +71,16 @@ public class NoteViewActivity extends AppCompatActivity {
         @Override
         public boolean onLongClick(View view) {
             longPress = true;
-            NoteViewActivity.this.createAlert(view);
+            NoteViewActivity.this.createDeleteAlert(view);
             return true;
         }
     };
+    private int idx;
 
     /**
-     * Erstellt den Löschalarm
+     * Erstellt den Lösch-Alarm
      */
-    private void createAlert(View view) {
+    private void createDeleteAlert(View view) {
         final Integer ID = Integer.valueOf(view.getTransitionName());
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(NoteViewActivity.this);
         alertDialogBuilder.setTitle(R.string.delete_tile);
@@ -82,7 +89,8 @@ public class NoteViewActivity extends AppCompatActivity {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 if (NoteViewActivity.this.appData.removeNote(ID)) {
-                    NoteViewActivity.this.populateNoteView(NoteViewActivity.this.appData.getNotes());
+                    view.setVisibility(View.GONE); // TODO this is fucking disaster bodge
+//                  NoteViewActivity.this.populateNoteView(NoteViewActivity.this.appData.getNotes());
                     longPress = false;
                 }
             }
@@ -151,6 +159,16 @@ public class NoteViewActivity extends AppCompatActivity {
         super.onCreateOptionsMenu(menu);
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.my_main, menu);
+
+//        findViewById(R.id.placeholder)
+
+        idx=0;
+        SubMenu subm = menu.getItem(1).getSubMenu(); // get my MenuItem with placeholder submenu
+        subm.clear(); // delete place holder
+        Set<String> uniqueTags = appData.getUniqueTags();
+        for (String tag : uniqueTags) {
+            subm.add(0,idx++,0, tag);
+        }
         return true;
     }
 
@@ -165,26 +183,37 @@ public class NoteViewActivity extends AppCompatActivity {
         view.removeAllViews();
 
         for (Note note : notes) {
-            AppCompatTextView sep = new AppCompatTextView(NoteViewActivity.this);
-            sep.setText(R.string.separator);
-            view.addView(sep);
+//            AppCompatTextView sep = new AppCompatTextView(NoteViewActivity.this);
+//            sep.setText(R.string.separator);
+//            view.addView(sep);
             if (toggleView) {
+                System.out.println("MarkdownView");
                 MarkdownView markdownView = new MarkdownView(this);
-                markdownView.loadMarkdown(note.getText());
+                markdownView.loadMarkdown(note.getText() + "\n___\n");
                 markdownView.setOnLongClickListener(this.deleteNoteOnLongClickHandler);
                 markdownView.setLongClickable(true);
                 markdownView.setTransitionName(String.valueOf(note.getID()));
                 markdownView.setOnTouchListener(this.openNoteOnTouchHandler);
                 view.addView(markdownView);
             } else {
-                AppCompatTextView textView = new AppCompatTextView(this);
-                textView.setText(note.getText());
-                textView.setClickable(true);
-                textView.setLongClickable(true);
-                textView.setOnClickListener(this.openNoteOnClickHandler);
-                textView.setOnLongClickListener(this.deleteNoteOnLongClickHandler);
-                textView.setTransitionName(String.valueOf(note.getID()));
-                view.addView(textView);
+                System.out.println("MarkdownWebView");
+                MarkdownWebView markdownView = new MarkdownWebView(this, note.getText().toString());
+                markdownView.setOnLongClickListener(this.deleteNoteOnLongClickHandler);
+                markdownView.setLongClickable(true);
+                markdownView.setTransitionName(String.valueOf(note.getID()));
+                markdownView.setOnTouchListener(this.openNoteOnTouchHandler);
+                view.addView(markdownView);
+
+
+
+//                AppCompatTextView textView = new AppCompatTextView(this);
+//                textView.setText(note.getText());
+//                textView.setClickable(true);
+//                textView.setLongClickable(true);
+//                textView.setOnClickListener(this.openNoteOnClickHandler);
+//                textView.setOnLongClickListener(this.deleteNoteOnLongClickHandler);
+//                textView.setTransitionName(String.valueOf(note.getID()));
+//                view.addView(textView);
             }
         }
     }
@@ -200,12 +229,23 @@ public class NoteViewActivity extends AppCompatActivity {
                 toggleView = !toggleView;
                 populateNoteView(appData.getNotes());
                 return true;
-            case R.id.action_delete_note:
-                System.out.println("TODO !!!!!!!!!!");
-                return true;
             default:
+                if (0 < item.getItemId() && item.getItemId() < idx){
+                    showSelectedTag(item.getTitle().toString());
+                }
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    private void showSelectedTag(String title) {
+        List<Note> notes = appData.getNotes();
+        ArrayList<Note> notesWithTag = new ArrayList<Note>();
+        for (Note note: notes) {
+            if (note.getTags().contains(title)){
+                notesWithTag.add(note);
+            }
+        }
+        populateNoteView(notesWithTag);
     }
 
     @Override

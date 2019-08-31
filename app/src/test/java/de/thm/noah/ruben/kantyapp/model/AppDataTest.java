@@ -18,10 +18,10 @@ public class AppDataTest {
     @Before
     public void setUp(){
         classToTest = new AppData();
-        classToTest.getNotes().add(new Note(classToTest.generateNewID(), "TEST1", new ArrayList<String>(Arrays.asList("11", "12", "13", "24")), null, new Date(), new Date()));
-        classToTest.getNotes().add(new Note(classToTest.generateNewID(), "TEST2", new ArrayList<String>(Arrays.asList("21", "22", "13", "24")), null, new Date(), new Date()));
-        classToTest.getNotes().add(new Note(classToTest.generateNewID(), "TEST3", new ArrayList<String>(Arrays.asList("21", "32", "3", "4")), null, new Date(), new Date()));
-        classToTest.getNotes().add(new Note(classToTest.generateNewID(), "TEST4", new ArrayList<String>(Arrays.asList("1", "2", "3", "4")), null, new Date(), new Date()));
+        classToTest.getNotes().add(new Note(classToTest.generateNewID(), "TEST1", new ArrayList<String>(Arrays.asList("11", "12", "13", "24")), reminderDates, null, new Date(), new Date()));
+        classToTest.getNotes().add(new Note(classToTest.generateNewID(), "TEST2", new ArrayList<String>(Arrays.asList("21", "22", "13", "24")), reminderDates, null, new Date(), new Date()));
+        classToTest.getNotes().add(new Note(classToTest.generateNewID(), "TEST3", new ArrayList<String>(Arrays.asList("21", "32", "3", "4")), reminderDates, null, new Date(), new Date()));
+        classToTest.getNotes().add(new Note(classToTest.generateNewID(), "TEST4", new ArrayList<String>(Arrays.asList("1", "2", "3", "4")), reminderDates, null, new Date(), new Date()));
     }
 
     @Test

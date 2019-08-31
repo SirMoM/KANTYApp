@@ -38,10 +38,32 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         appData = new AppData();
 
+        // lade Daten wenn welche vorhanden sind
+        boolean loadDataSuccessfully = loadData(savedInstanceState);
+
         NotificationHandler.createNotificationChannel(this); // create Notification channel to always  have one ?
 
-        // lade Daten wenn welche vorhanden sind
-        if (loadData(savedInstanceState)) {
+        // Get the intent that started this activity
+        Intent gotIntent = getIntent();
+
+        // Get the action of the intent
+        String action = gotIntent.getAction();
+
+        // Get the type of intent (Text or Image)
+        String type = gotIntent.getType();
+
+        // When Intent's action is 'ACTION+SEND' and Type is not null
+        if (Intent.ACTION_SEND.equals(action) && type != null && loadDataSuccessfully) {
+
+            // When type is 'text/plain'
+            if ("text/plain".equals(type)) {
+                String sharedText = gotIntent.getStringExtra(Intent.EXTRA_TEXT);
+                Intent intent = new Intent(this, NoteEditActivity.class);
+                intent.putExtra(ValueKey.APP_DATA, appData);
+                intent.putExtra(ValueKey.NOTE_TEXT, sharedText);
+                startActivity(intent);
+            }
+        } else if(loadDataSuccessfully) {
             Intent intent = new Intent(this, NoteViewActivity.class);
             intent.putExtra(ValueKey.APP_DATA, appData);
             startActivity(intent);
