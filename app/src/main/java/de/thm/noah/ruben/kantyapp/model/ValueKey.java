@@ -35,4 +35,9 @@ public interface ValueKey {
 // Markdown signs after
     public static final String H_RULE  = "\n---\n";
 
+    String EMPTY_TABLE =
+            "| First Header  | Second Header |\n" +
+            "| ------------- | ------------- |\n" +
+            "| Content Cell  | Content Cell  |\n" +
+            "| Content Cell  | Content Cell  |\n" ;
 }

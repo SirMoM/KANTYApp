@@ -202,6 +202,17 @@ public class Note implements Serializable {
     }
 
     /**
+     * Ruft die erste Zeile der Notiz ab. <p>
+     * Dies kann als "Header" verwendet werden.
+     *
+     * @Return die Kopfzeile des Hinweises Aka die erste Zeile
+     */
+    public String getFirstLine(){
+        String[] result = getText().split(System.lineSeparator(), 2);
+        return result[0];
+    }
+
+    /**
      * Fügt Tags einer Notiz hinzu wenn diese den Tag nicht schon besitzt.
      *
      * @param tag Fügt einen Tag zu dem bestehenden tags hinzu.

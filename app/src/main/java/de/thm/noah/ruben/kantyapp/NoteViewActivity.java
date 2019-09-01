@@ -10,10 +10,8 @@ import android.view.SubMenu;
 import android.view.View;
 import android.widget.LinearLayout;
 
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.appcompat.widget.Toolbar;
 
@@ -27,12 +25,11 @@ import de.thm.noah.ruben.kantyapp.model.AppData;
 import de.thm.noah.ruben.kantyapp.model.Note;
 import de.thm.noah.ruben.kantyapp.model.ValueKey;
 import de.thm.noah.ruben.kantyapp.views.MarkdownWebView;
-import us.feras.mdv.MarkdownView;
 
 /**
  * @author Noah Ruben
  * <p>
- * Diese Activity conntrolliert die note_view_layout.xml View.
+ * Diese Activity conntrolliert die notelist_view.xmlew.
  * Diese stellt alle Notizen dar.
  */
 public class NoteViewActivity extends AppCompatActivity {
@@ -76,6 +73,7 @@ public class NoteViewActivity extends AppCompatActivity {
         }
     };
     private int idx;
+    private boolean notFullList =  false;
 
     /**
      * Erstellt den Lösch-Alarm
@@ -92,6 +90,7 @@ public class NoteViewActivity extends AppCompatActivity {
                     view.setVisibility(View.GONE); // TODO this is fucking disaster bodge
 //                  NoteViewActivity.this.populateNoteView(NoteViewActivity.this.appData.getNotes());
                     longPress = false;
+                    appData.saveNotesToFile(NoteViewActivity.this.getFilesDir());
                 }
             }
         });
@@ -131,7 +130,7 @@ public class NoteViewActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         System.out.println("NoteViewActivity.onCreate");
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.note_view_layout);
+        setContentView(R.layout.notelist_view);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
     }
@@ -187,14 +186,22 @@ public class NoteViewActivity extends AppCompatActivity {
 //            sep.setText(R.string.separator);
 //            view.addView(sep);
             if (toggleView) {
-                System.out.println("MarkdownView");
-                MarkdownView markdownView = new MarkdownView(this);
-                markdownView.loadMarkdown(note.getText() + "\n___\n");
-                markdownView.setOnLongClickListener(this.deleteNoteOnLongClickHandler);
-                markdownView.setLongClickable(true);
-                markdownView.setTransitionName(String.valueOf(note.getID()));
-                markdownView.setOnTouchListener(this.openNoteOnTouchHandler);
-                view.addView(markdownView);
+//                System.out.println("MarkdownView");
+//                MarkdownView markdownView = new MarkdownView(this);
+//                markdownView.loadMarkdown(note.getText() + "\n___\n");
+//                markdownView.setOnLongClickListener(this.deleteNoteOnLongClickHandler);
+//                markdownView.setLongClickable(true);
+//                markdownView.setTransitionName(String.valueOf(note.getID()));
+//                markdownView.setOnTouchListener(this.openNoteOnTouchHandler);
+//                view.addView(markdownView);
+                AppCompatTextView textView = new AppCompatTextView(this);
+                textView.setText(note.getText() + "\n\n ==========================================" );
+                textView.setClickable(true);
+                textView.setLongClickable(true);
+                textView.setOnClickListener(this.openNoteOnClickHandler);
+                textView.setOnLongClickListener(this.deleteNoteOnLongClickHandler);
+                textView.setTransitionName(String.valueOf(note.getID()));
+                view.addView(textView);
             } else {
                 System.out.println("MarkdownWebView");
                 MarkdownWebView markdownView = new MarkdownWebView(this, note.getText().toString());
@@ -206,14 +213,6 @@ public class NoteViewActivity extends AppCompatActivity {
 
 
 
-//                AppCompatTextView textView = new AppCompatTextView(this);
-//                textView.setText(note.getText());
-//                textView.setClickable(true);
-//                textView.setLongClickable(true);
-//                textView.setOnClickListener(this.openNoteOnClickHandler);
-//                textView.setOnLongClickListener(this.deleteNoteOnLongClickHandler);
-//                textView.setTransitionName(String.valueOf(note.getID()));
-//                view.addView(textView);
             }
         }
     }
@@ -237,21 +236,27 @@ public class NoteViewActivity extends AppCompatActivity {
         }
     }
 
-    private void showSelectedTag(String title) {
+    private void showSelectedTag(String tag) {
         List<Note> notes = appData.getNotes();
         ArrayList<Note> notesWithTag = new ArrayList<Note>();
         for (Note note: notes) {
-            if (note.getTags().contains(title)){
+            if (note.getTags().contains(tag)){
+                System.out.println(note);
                 notesWithTag.add(note);
             }
         }
         populateNoteView(notesWithTag);
+        notFullList = true;
     }
 
     @Override
     public void onBackPressed() {
-        appData.saveNotesToFile(this.getFilesDir());
-        moveTaskToBack(true);
+        if(notFullList){
+            populateNoteView(appData.getNotes());
+        }else {
+            appData.saveNotesToFile(this.getFilesDir());
+            moveTaskToBack(true);
+        }
 //        super.onBackPressed();
     }
 }

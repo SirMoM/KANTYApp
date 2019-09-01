@@ -44,17 +44,20 @@
                                     android:title="H5"/>
                         </menu>
                 </item>
-
-                <item   android:id="@+id/h_rule"
-                        android:title="@string/h_rule" />
-                <item   android:id="@+id/date"
-                        android:title="@string/date" />
-                <item   android:id="@+id/tag"
-                        android:title="@string/tag" />
                 <item   android:id="@+id/bold"
-                        android:title="@string/bold" />
+                    android:title="@string/bold" />
                 <item   android:id="@+id/italic"
-                        android:title="@string/italic" />
+                    android:title="@string/italic" />
+                <item   android:id="@+id/strikethrough"
+                android:title="@string/strikethrough"/>
+                <item   android:id="@+id/h_rule"
+                android:title="@string/h_rule" />
+                <item   android:id="@+id/date"
+                android:title="@string/date" />
+                <item   android:id="@+id/tag"
+                android:title="@string/tag" />
+                <item   android:id="@+id/empty_table"
+                    android:title="@string/Empty_table"/>
             </menu>
     </item>
     <item

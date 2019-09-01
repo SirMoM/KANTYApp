@@ -30,4 +30,6 @@
     <string name="action_show_tag_x">Show notes with tag</string>
     <string name="action_reset">Reset List</string>
     <string name="show_text">Show text</string>
+    <string name="strikethrough">Strikethrough</string>
+    <string name="Empty_table">Empty Tab</string>
 </resources>

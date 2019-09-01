@@ -95,9 +95,9 @@ public class NoteEditActivity extends AppCompatActivity {
 
         if (noteID == null) {
             Serializable extra = getIntent().getSerializableExtra(ValueKey.NOTE_TEXT);
-            if (extra != null){
+            if (extra != null) {
                 note_edit_view.setText((String) extra);
-            }else {
+            } else {
                 note_edit_view.setText("# Keep a Note to Yourself \n Noah Ruben");
             }
             editExistingNote = false;
@@ -159,11 +159,10 @@ public class NoteEditActivity extends AppCompatActivity {
      * @param text Der zu verarbeitende Text
      */
     private void preProcessingText(String text, Note note) {
-//      TODO get tags to note
         Pattern tagPattern = Pattern.compile("\\$\\w+\\s?");
         Matcher tagMatcher = tagPattern.matcher(text);
         while (tagMatcher.find()) {
-            String tagString = tagMatcher.group().substring(1);
+            String tagString = tagMatcher.group().substring(1).trim();
             System.out.println("tagString = " + tagString);
             appData.getUniqueTags().add(tagString);
             if (note.addTagToNote(tagString)) {
@@ -182,26 +181,26 @@ public class NoteEditActivity extends AppCompatActivity {
                 date = dTF.parse(dateTimeMatcher.group());
                 System.out.println("\t \t \t \t \t \t \t DTF = " + date);
             } catch (ParseException e) {
-//                e.printStackTrace();
+                e.printStackTrace();
             }
             if (date == null) {
                 try {
                     date = dF.parse(dateTimeMatcher.group());
                     System.out.println("\t \t \t \t \t \t \t DF = " + date);
                 } catch (ParseException e) {
-//                e.printStackTrace();
+                e.printStackTrace();
                 }
             }
-//            createAddReminderAlert(date);
             System.out.println("dateTimeMatcher.group() = " + dateTimeMatcher.group());
             boolean b = note.addReminderDate(dateTimeMatcher.group());
-            if (b && date != null){
-                Notification notification = NotificationHandler.getNotification(NoteEditActivity.this, note.getText());
+            if (b && date != null) {
+                Notification notification = NotificationHandler.getNotification(NoteEditActivity.this, note.getFirstLine());
                 NotificationHandler.scheduleNotification(NoteEditActivity.this, notification, date);
                 Toast.makeText(this, "Created " + dTF.format(date) + " Notification for this note!", Toast.LENGTH_LONG).show();
             }
         }
     }
+
     /**
      * Erstellt die "Benachrichtigung hinzufügen"-Warnung
      */
@@ -284,28 +283,27 @@ public class NoteEditActivity extends AppCompatActivity {
                 return true;
             case R.id.italic:
                 addMdBeforeAfter(tv, ValueKey.ITALIC);
+            case R.id.strikethrough:
+                addMdBeforeAfter(tv, ValueKey.STRIKETHROUGH);
+            case R.id.empty_table:
+                addMdBefore(tv, ValueKey.EMPTY_TABLE);
                 return true;
             case R.id.show_md_menu_item:
-//                TODO add WebView and Markdown-Parser make this the default thing?
-
                 CoordinatorLayout layout = findViewById(R.id.layout);
 
                 EditText view = findViewById(R.id.note);
-                if (showMd){
+                if (showMd) {
                     view.setVisibility(View.GONE);
                     markdownWebView = new MarkdownWebView(this, view.getText().toString());
                     layout.addView(markdownWebView);
                     item.setTitle(R.string.show_text);
                     showMd = false;
-                }else {
+                } else {
                     view.setVisibility(View.VISIBLE);
                     layout.removeView(markdownWebView);
                     item.setTitle(R.string.show_md);
                     showMd = true;
                 }
-
-
-
                 return true;
             case R.id.share_menu_item:
                 Intent share = new Intent(android.content.Intent.ACTION_SEND);
@@ -323,42 +321,64 @@ public class NoteEditActivity extends AppCompatActivity {
         }
     }
 
-    private void addMdBefore(EditText tv, String textToInsert) {
-        int start = Math.max(tv.getSelectionStart(), 0);
-        int end = Math.max(tv.getSelectionEnd(), 0);
-        String text = tv.getText().toString();
+    /**
+     * Fügt Markdown elemente vor dem markierten Wort / Cursor ein.
+     *
+     * @param textEditView Die "view" zu der das "Markdown"-Element hinzugefügt werden soll
+     * @param textToInsert Das "Markdown"-Element das hinzugefügt werden soll
+     */
+    private void addMdBefore(EditText textEditView, String textToInsert) {
+        int start = Math.max(textEditView.getSelectionStart(), 0);
+        int end = Math.max(textEditView.getSelectionEnd(), 0);
+        String text = textEditView.getText().toString();
         String selectedText = text.substring(Math.min(start, end), Math.max(start, end));
         String firstTextHalf = text.substring(0, start);
         String lastTextHalf = text.substring(end);
         textToInsert = textToInsert + selectedText;
-        tv.setText(firstTextHalf + textToInsert + lastTextHalf);
-        tv.setSelection(start);
+        textEditView.setText(firstTextHalf + textToInsert + lastTextHalf);
+        textEditView.setSelection(end);
     }
-    private void addMdAfter(EditText tv, String textToInsert) {
-        int start = Math.max(tv.getSelectionStart(), 0);
-        int end = Math.max(tv.getSelectionEnd(), 0);
-        String text = tv.getText().toString();
+
+    /**
+     * Fügt Markdown elemente nach dem markierten Wort / Cursor ein.
+     *
+     * @param textEditView Die "view" zu der das "Markdown"-Element hinzugefügt werden soll
+     * @param textToInsert Das "Markdown"-Element das hinzugefügt werden soll
+     */
+    private void addMdAfter(EditText textEditView, String textToInsert) {
+        int start = Math.max(textEditView.getSelectionStart(), 0);
+        int end = Math.max(textEditView.getSelectionEnd(), 0);
+        String text = textEditView.getText().toString();
         String selectedText = text.substring(Math.min(start, end), Math.max(start, end));
         String firstTextHalf = text.substring(0, start);
         String lastTextHalf = text.substring(end);
         textToInsert = selectedText + textToInsert;
-        tv.setText(firstTextHalf + textToInsert + lastTextHalf);
-        tv.setSelection(start);
+        textEditView.setText(firstTextHalf + textToInsert + lastTextHalf);
+        textEditView.setSelection(end);
     }
-    private void addMdBeforeAfter(EditText tv, String textToInsert) {
-        int start = Math.max(tv.getSelectionStart(), 0);
-        int end = Math.max(tv.getSelectionEnd(), 0);
-        String text = tv.getText().toString();
+
+    /**
+     * Fügt Markdown elemente vor und nach dem markierten Wort / Cursor ein.
+     *
+     * @param textEditView Die "view" zu der das "Markdown"-Element hinzugefügt werden soll
+     * @param textToInsert Das "Markdown"-Element das hinzugefügt werden soll
+     */
+    private void addMdBeforeAfter(EditText textEditView, String textToInsert) {
+        int start = Math.max(textEditView.getSelectionStart(), 0);
+        int end = Math.max(textEditView.getSelectionEnd(), 0);
+        String text = textEditView.getText().toString();
         String selectedText = text.substring(Math.min(start, end), Math.max(start, end));
         String firstTextHalf = text.substring(0, start);
         String lastTextHalf = text.substring(end);
         textToInsert = textToInsert + selectedText + textToInsert;
-        tv.setText(firstTextHalf + textToInsert + lastTextHalf);
-        tv.setSelection(start);
+        textEditView.setText(firstTextHalf + textToInsert + lastTextHalf);
+        textEditView.setSelection(end);
     }
 
     /**
-     * Shows the
+     * Zeigt den TimePicker an und gibt die Informationen
+     * {@link NoteEditActivity#notificationDateTimeCache} und ruft den {@link NotificationHandler}
+     * der eine Notification erzeugt und sie entsprechend {@link NoteEditActivity#notificationDateTimeCache} einplant.
      */
     private void showTimePickerDialog() {
         LocalDateTime now = LocalDateTime.now();
@@ -377,14 +397,10 @@ public class NoteEditActivity extends AppCompatActivity {
                 notificationDateTimeCache = notificationDateTimeCache.withSecond(0);
                 notificationDateTimeCache = notificationDateTimeCache.withNano(0);
 
-                Notification notification = NotificationHandler.getNotification(NoteEditActivity.this, notificationDateTimeCache.toString());
+                Notification notification = NotificationHandler.getNotification(NoteEditActivity.this, note.getFirstLine());
                 NotificationHandler.scheduleNotification(NoteEditActivity.this, notification, Date.from(notificationDateTimeCache.atZone(ZoneId.systemDefault()).toInstant()));
             }
-
         }, now.getHour(), now.getMinute(), true);
-//        builder.setOnCancelListener(x -> {
-//            //TODO TOAST????
-//        });
         builder.setCustomTitle(header);
         builder.show();
     }
