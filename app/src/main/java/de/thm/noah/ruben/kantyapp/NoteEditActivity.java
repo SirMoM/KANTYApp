@@ -283,8 +283,10 @@ public class NoteEditActivity extends AppCompatActivity {
                 return true;
             case R.id.italic:
                 addMdBeforeAfter(tv, ValueKey.ITALIC);
+                return true;
             case R.id.strikethrough:
                 addMdBeforeAfter(tv, ValueKey.STRIKETHROUGH);
+                return true;
             case R.id.empty_table:
                 addMdBefore(tv, ValueKey.EMPTY_TABLE);
                 return true;

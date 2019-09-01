@@ -33,9 +33,9 @@ public interface ValueKey {
     public static final String STRIKETHROUGH  = "~~";
 
 // Markdown signs after
-    public static final String H_RULE  = "\n---\n";
+    public static final String H_RULE  = "\n___\n";
 
-    String EMPTY_TABLE =
+    public static final String EMPTY_TABLE =
             "| First Header  | Second Header |\n" +
             "| ------------- | ------------- |\n" +
             "| Content Cell  | Content Cell  |\n" +
