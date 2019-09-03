@@ -6,27 +6,29 @@
         android:id="@+id/delete_menu_item"
         android:icon="@android:drawable/ic_menu_delete"
         android:title="@string/delete"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/save_menu_item"
         android:icon="@android:drawable/ic_menu_save"
         android:title="@string/save"
-        app:showAsAction="always" />
+        app:showAsAction="ifRoom" />
     <item
         android:id="@+id/add_reminder_menu_item"
         android:icon="@android:drawable/ic_menu_recent_history"
         android:title="@string/add_reminder"
+        android:orderInCategory="1"
         app:showAsAction="always" />
-    <item
-        android:id="@+id/add_tag_menu_item"
-        android:icon="@android:drawable/ic_menu_info_details"
-        android:title="@string/tag"
-        app:showAsAction="ifRoom" />
+<!--    <item-->
+<!--        android:id="@+id/add_tag_menu_item"-->
+<!--        android:icon="@android:drawable/ic_menu_info_details"-->
+<!--        android:title="@string/tag"-->
+<!--        app:showAsAction="ifRoom" />-->
     <item
         android:id="@+id/add_md_menu_item"
         android:icon="@android:drawable/ic_menu_more"
         android:title="@string/add_md"
-        app:showAsAction="ifRoom">
+        android:orderInCategory="2"
+        app:showAsAction="always">
             <!-- "md" submenu -->
             <menu>
                 <item   android:id="@+id/header"
@@ -64,7 +66,8 @@
         android:id="@+id/show_md_menu_item"
         android:icon="@android:drawable/ic_menu_agenda"
         android:title="@string/show_md"
-        app:showAsAction="ifRoom" />
+        android:orderInCategory="1"
+        app:showAsAction="always" />
     <item
         android:id="@+id/share_menu_item"
         android:icon="@android:drawable/ic_menu_share"

@@ -205,7 +205,7 @@ public class Note implements Serializable {
      * Ruft die erste Zeile der Notiz ab. <p>
      * Dies kann als "Header" verwendet werden.
      *
-     * @Return die Kopfzeile des Hinweises Aka die erste Zeile
+     * @return die Kopfzeile des Hinweises Aka die erste Zeile
      */
     public String getFirstLine(){
         String[] result = getText().split(System.lineSeparator(), 2);

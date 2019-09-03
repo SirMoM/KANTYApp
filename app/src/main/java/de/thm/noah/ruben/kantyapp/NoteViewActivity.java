@@ -228,6 +228,9 @@ public class NoteViewActivity extends AppCompatActivity {
                 toggleView = !toggleView;
                 populateNoteView(appData.getNotes());
                 return true;
+            case R.id.action_reset:
+                populateNoteView(appData.getNotes());
+                return true;
             default:
                 if (0 < item.getItemId() && item.getItemId() < idx){
                     showSelectedTag(item.getTitle().toString());

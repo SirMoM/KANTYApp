@@ -118,7 +118,7 @@ public class NoteEditActivity extends AppCompatActivity {
     }
 
     /**
-     * creates and sends the Intend to change views to NoteView TODO GERMAN
+     * Erstellt und sendet den "Intend" , die Ansichten zur "NoteView" zu ändern
      */
     private void goToNoteViewActivity() {
         Intent newNoteIntent = new Intent(this, NoteViewActivity.class);
@@ -251,9 +251,9 @@ public class NoteEditActivity extends AppCompatActivity {
 //                      * als Kalender eintrag
                 showDatePickerDialog();
                 return true;
-            case R.id.add_tag_menu_item:
+//            case R.id.add_tag_menu_item:
 //                TODO add Alert to fill in TAG (Auto complete?)
-                return true;
+//                return true;
             case R.id.h1:
                 addMdBefore(tv, ValueKey.H1);
                 return true;
@@ -399,7 +399,10 @@ public class NoteEditActivity extends AppCompatActivity {
                 notificationDateTimeCache = notificationDateTimeCache.withSecond(0);
                 notificationDateTimeCache = notificationDateTimeCache.withNano(0);
 
-                Notification notification = NotificationHandler.getNotification(NoteEditActivity.this, note.getFirstLine());
+                NoteEditActivity.this.handleAppDataUpdate();
+                editExistingNote = true;
+
+                Notification notification = NotificationHandler.getNotification(NoteEditActivity.this, ((EditText)findViewById(R.id.note)).getText().toString().split(System.lineSeparator(), 2)[0]);
                 NotificationHandler.scheduleNotification(NoteEditActivity.this, notification, Date.from(notificationDateTimeCache.atZone(ZoneId.systemDefault()).toInstant()));
             }
         }, now.getHour(), now.getMinute(), true);
@@ -428,7 +431,6 @@ public class NoteEditActivity extends AppCompatActivity {
         };
         LayoutInflater inflater = getLayoutInflater();
         View header = inflater.inflate(R.layout.timepicker_header, null);
-        // TODO DOKU monate fangen hier mit 0 an i guess
         DatePickerDialog builder = new DatePickerDialog(this, R.style.DialogTheme, onDateSetListener, today.getYear(), today.getMonthValue() - 1, today.getDayOfMonth());
         builder.setCustomTitle(header);
         builder.show();
